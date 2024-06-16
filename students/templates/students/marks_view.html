@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Marks for {{ student.name }}</title>
+</head>
+
+<body>
+    <h1>Marks for {{ student.name }}</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Roll no</th>
+                <th>Name</th>
+                <th>Subject</th>
+                <th>Marks</th>
+                <!-- Add more columns as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for mark in marks %}
+            <tr>
+                <td>{{ student.roll_number }}</td>
+                <td>{{ student.name }}</td>
+                <td>{{ mark.subject }}</td>
+                <td>{{ mark.mark }}</td>
+                
+                <!-- Add more columns as needed -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

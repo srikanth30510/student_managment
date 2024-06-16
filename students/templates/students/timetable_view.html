@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Timetable for {{ student.name }}</title>
+</head>
+<body>
+    <h1>Time Table  for {{ student.name }}</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Subject</th>
+                <th>start_time</th>
+                <th>End_time</th>
+                <!-- Add more columns as needed -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for timetable in timetables %}
+            <tr>
+                <td>{{ timetable.day }}</td>
+                <td>{{ timetable.subject }}</td>
+                <td>{{ timetable.start_date }}</td>
+                <td>{{ timetable.end_date }}</td>
+                
+                <!-- Add more columns as needed -->
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+
+</html>
