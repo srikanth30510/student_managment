@@ -5,6 +5,7 @@ from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import ClassForm, StudentForm, AttendanceForm
 from .models import Student, Timetable, Mark, Attendance, Class
+from django.contrib import messages
 
 def navbar(request):
     return render(request, 'students/navbar.html')
@@ -56,37 +57,92 @@ def add_student(request):
         form = StudentForm()
     return render(request, 'students/add_student.html', {'form': form})
 
-def edit_student(request,pk):
-    student=get_object_or_404(Student,pk=pk)
+# def edit_student(request,pk):
+#     student=get_object_or_404(Student,pk=pk)
+#     if request.method == 'POST':
+#         form = StudentForm(request.POST,instance=student)
+#         if form.is_valid():
+#             form.save()
+#             return redirect('student_list')
+#     else:
+#         form = StudentForm(instance=student)
+#     return render(request, 'edit_student.html',{'form':form})
+
+# def confirm_delete(request,pk):
+#     student=get_object_or_404(Student,pk=pk)
+#     if request.method == 'POST':
+#         student.delete()
+#         return redirect('student_list')
+#     return render(request,'confirm_delete.html',{'student':student})
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Student
+from .forms import StudentForm
+
+def edit_student(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    
     if request.method == 'POST':
-        form = StudentForm(request.POST,instance=student)
+        form = StudentForm(request.POST, instance=student)
         if form.is_valid():
             form.save()
             return redirect('student_list')
     else:
         form = StudentForm(instance=student)
-    return render(request, 'edit_student.html',{'form':form})
+    
+    return render(request, 'students/edit_student.html', {'form': form})
 
-def confirm_delete(request,pk):
-    student=get_object_or_404(Student,pk=pk)
+def confirm_delete(request, pk):
+    student = get_object_or_404(Student, pk=pk)
+    
     if request.method == 'POST':
         student.delete()
         return redirect('student_list')
-    return render(request,'confirm_delete.html',{'student':student})
+    
+    return render(request, 'students/confirm_delete.html', {'student': student})
+
 
 
 def class_detail(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
     students = Student.objects.filter(student_class=student_class)
+    
     if request.method == 'POST':
-        for student in students:
-            form = AttendanceForm(request.POST, prefix=str(student.id))
+        forms = [
+            (student, AttendanceForm(request.POST, prefix=str(student.id), initial={'student': student, 'date': date.today()}))
+            for student in students
+        ]
+        
+        all_valid = True
+        for student, form in forms:
             if form.is_valid():
-                form.save()
-        return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
+                pass
+            else:
+                all_valid = False
+        
+        if all_valid:
+            for student, form in forms:
+                attendance = form.save(commit=False)
+                attendance.date = date.today()
+                attendance.save()
+            messages.success(request, "Attendance submitted successfully!")
+            return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
+    
     else:
-        forms = {student.id: AttendanceForm(prefix=str(student.id), initial={'student': student, 'date': date.today()}) for student in students}
-    return render(request, 'students/class_detail.html', {'student_class': student_class, 'students': students, 'forms': forms})
+        forms = [
+            (student, AttendanceForm(prefix=str(student.id), initial={'student': student, 'date': date.today()}))
+            for student in students
+        ]
+    
+    return render(request, 'students/class_detail.html', {
+        'student_class': student_class,
+        'students': forms  # List of tuples: (student, form)
+    })
+
+
+
+
+
 
 def student_detail(request, student_id):
     student = get_object_or_404(Student, id=student_id)

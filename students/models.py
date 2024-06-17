@@ -1,4 +1,6 @@
 from django.db import models
+from django.shortcuts import render, get_object_or_404
+
 
 class Class(models.Model):
     name = models.CharField(max_length=100)
@@ -41,3 +43,18 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.student.name} - {self.date} - {self.status}"
+    
+def class_details(request, class_id):
+    student_class = get_object_or_404(Class, pk=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    attendance_forms = [Attendance(initial={'student': student}) for student in students]
+
+    if request.method == 'POST':
+        # Handle the form submission logic here
+        pass
+
+    return render(request, 'class_details.html', {
+        'student_class': student_class,
+        'students': students,
+        'attendance_forms': attendance_forms,
+    })

@@ -13,12 +13,13 @@ class StudentForm(forms.ModelForm):
         fields = ['name', 'roll_number', 'student_class','email','phone']
 
 
+
 class AttendanceForm(forms.ModelForm):
     class Meta:
-        model=Attendance
-        fields=['student','date','status']
-        widgets={
+        model = Attendance
+        fields = ['status', 'student', 'date']
+        widgets = {
             'student': forms.HiddenInput(),
-            'date': forms.HiddenInput(),
-            'status': forms.RadioSelect(choices=[('P','Present'),('A','Absent')]),
+            'date': forms.HiddenInput()
         }
+

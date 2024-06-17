@@ -7,19 +7,36 @@
 </head>
 <body>
     {% include 'students/navbar.html' %}
-
     <h1>{{ student_class.name }}</h1>
     <a href="{% url 'add_student_to_class' student_class.id %}">Add Student to {{ student_class.name }}</a>
-    <form method="post">
+
+    <!-- Display messages -->
+    {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+    
+    <form method="post" action="">
         {% csrf_token %}
         <ul>
-            {% for student in students %}
+            {% for student, form in students %}
                 <li>
-                    {{ student.id }}:{{ student.name }}:{{ forms.student.status }}
+                    {{ student.id }}: {{ student.name }}
+                    {{ form.non_field_errors }}
+                    <div class="form-group">
+                        {{ form.status.label_tag }} {{ form.status }}
+                        {{ form.student }}  <!-- Include hidden student field -->
+                        {{ form.date }}     <!-- Include hidden date field -->
+                    </div>
                 </li>
             {% endfor %}
         </ul>
-        <button type="submit">Submit Attendance</button>
+        <button type="submit" class="btn btn-primary">Submit Attendance</button>
     </form>
 </body>
 </html>
