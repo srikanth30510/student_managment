@@ -20,6 +20,7 @@ class AttendanceForm(forms.ModelForm):
         fields = ['status', 'student', 'date']
         widgets = {
             'student': forms.HiddenInput(),
-            'date': forms.HiddenInput()
+            'date': forms.HiddenInput(),
+            'status': forms.RadioSelect(choices=[('P', 'Present'), ('A', 'Absent')])
         }
 

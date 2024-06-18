@@ -159,6 +159,17 @@ def submit_attendance(request):
         return JsonResponse({'success': True})
     return JsonResponse({'success': False}, status=400)
 
+def class_attendance(request, class_id):
+    student_class = get_object_or_404(Student, id=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    attendances = Attendance.objects.filter(student__in=students).order_by('date')
+
+    return render(request, 'class_attendance.html', {
+        'student_class': student_class,
+        'students': students,
+        'attendances': attendances,
+    })
+
 def add_student_to_class(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
     if request.method == 'POST':
