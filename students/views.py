@@ -3,9 +3,11 @@ from datetime import date
 import json
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
-from .forms import ClassForm, StudentForm, AttendanceForm
+from .forms import ClassForm, StudentForm, AttendanceForm,SignUpForm
 from .models import Student, Timetable, Mark, Attendance, Class
 from django.contrib import messages
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.forms import AuthenticationForm
 
 def navbar(request):
     return render(request, 'students/navbar.html')
@@ -13,6 +15,36 @@ def navbar(request):
 def home(request):
     students = Student.objects.all()
     return render(request, 'students/home.html', {'students': students})
+
+def register(request):
+    if request.method == 'POST':
+        form = SignUpForm(request.POST)
+        if form.is_valid():
+            form.save()
+            username=form.cleaned_data.get('username')
+            password=form.cleaned_data.get('password1')
+            user=authenticate(username=username,password=password)
+            login(request,user)
+            return redirect('Login')
+        else:
+            form=SignUpForm()
+        return render(request,'students/register.html',{'form':form})
+    
+def login_view(request):
+    if request.method == 'POST':
+        form =AuthenticationForm(request,data=request.POST)
+        if form.is_valid():
+            username=form.cleaned_data.get('username')
+            password=form.cleaned_data.get('password')
+            user=authenticate(username=username,password=password)
+            if user is not None:
+                login(request,user)
+                return redirect('home')
+            else:
+                form=AuthenticationForm()
+            return render(request,'students/Login.html',{'form': form})
+        
+
 
 def student_list(request):
     students = Student.objects.all()
