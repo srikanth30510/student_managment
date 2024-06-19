@@ -4,21 +4,36 @@
     <title>{{ student_class.name }}'s Details</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .table thead th {
+            background-color: #343a40;
+            color: white;
+        }
+        .btn-primary {
+            background-color: #007bff;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .alert {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
     {% include 'students/navbar.html' %}
-    <h1>{{ student_class.name }}</h1>
-    <a href="{% url 'add_student_to_class' student_class.id %}">Add Student to {{ student_class.name }}</a>
-
-    <!-- Display messages -->
-    {% if messages %}
-        <div class="container mt-3">
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }}">
-                    {{ message }}
-                </div>
-            {% endfor %}
+    <div class="container">
+        <h1 class="text-center">{{ student_class.name }}</h1>
+        <div class="d-flex justify-content-center mb-3">
+            <a href="{% url 'add_student_to_class' student_class.id %}" class="btn btn-primary">Add Student to {{ student_class.name }}</a>
         </div>
+<<<<<<< HEAD
     {% endif %}
     
     <form method="post" action="">
@@ -32,11 +47,57 @@
                         {{ form.status.label_tag }} {{ form.status }}
                         {{ form.student }}  
                         {{ form.date }}     
+=======
+
+        <!-- Display messages -->
+        {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+>>>>>>> 99621fc99e9beeb9f09cd7a9a0e63e3f6181e519
                     </div>
-                </li>
-            {% endfor %}
-        </ul>
-        <button type="submit" class="btn btn-primary">Submit Attendance</button>
-    </form>
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Roll No</th>
+                            <th>Class/Sec</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student, form in students %}
+                            <tr>
+                                <td>{{ student.id }}</td>
+                                <td>{{ student.roll_number }}</td>
+                                <td>{{ student.student_class }}</td>
+                                <td>{{ student.name }}</td>
+                                <td>
+                                    {{ form.non_field_errors }}
+                                    <div class="form-group">
+                                        {{ form.student }}  <!-- Include hidden student field -->
+                                        {{ form.date }}     <!-- Include hidden date field -->
+                                        {{ form.status.label_tag }} {{ form.status }}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <div class="text-center">
+                <button type="submit" class="btn btn-success">Submit Attendance</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>
