@@ -136,7 +136,7 @@ def class_detail(request, class_id):
     
     return render(request, 'students/class_detail.html', {
         'student_class': student_class,
-        'students': forms  # List of tuples: (student, form)
+        'students': forms  
     })
 
 
