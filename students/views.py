@@ -25,7 +25,7 @@ def register(request):
             password=form.cleaned_data.get('password1')
             user=authenticate(username=username,password=password)
             login(request,user)
-            return redirect('students/Login.html')
+            return redirect('login')
         else:
             form=SignUpForm()
         return render(request,'students/register.html',{'form':form})
@@ -42,7 +42,7 @@ def login_view(request):
                 return redirect('home')
             else:
                 form=AuthenticationForm()
-            return render(request,'students/Login.html',{'form': form})
+            return render(request,'students/login.html',{'form': form})
         
 
 
@@ -196,7 +196,7 @@ def class_attendance(request, class_id):
     students = Student.objects.filter(student_class=student_class)
     attendances = Attendance.objects.filter(student__in=students).order_by('date')
 
-    return render(request, 'class_attendance.html', {
+    return render(request, 'students/class_attendance.html', {
         'student_class': student_class,
         'students': students,
         'attendances': attendances,
