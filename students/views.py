@@ -26,7 +26,7 @@ def register(request):
             password=form.cleaned_data.get('password1')
             user=authenticate(username=username,password=password)
             login(request,user)
-            return redirect('students/Login.html')
+            return redirect('login')
         else:
             form=SignUpForm()
         return render(request,'students/register.html',{'form':form})
@@ -44,7 +44,6 @@ def login_view(request):
             else:
                 form=AuthenticationForm()
             return render(request,'students/Login.html',{'form': form})
-    return redirect('students/Login.html')
         
 def logout_view(request):
     logout(request)
