@@ -8,6 +8,7 @@ from .models import Student, Timetable, Mark, Attendance, Class
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import logout
 
 def navbar(request):
     return render(request, 'students/navbar.html')
@@ -43,8 +44,11 @@ def login_view(request):
             else:
                 form=AuthenticationForm()
             return render(request,'students/Login.html',{'form': form})
+    return redirect('students/Login.html')
         
-
+def logout_view(request):
+    logout(request)
+    return redirect('home')
 
 def student_list(request):
     students = Student.objects.all()
@@ -192,15 +196,16 @@ def submit_attendance(request):
     return JsonResponse({'success': False}, status=400)
 
 def class_attendance(request, class_id):
-    student_class = get_object_or_404(Student, id=class_id)
+    student_class = get_object_or_404(Class, id=class_id)
     students = Student.objects.filter(student_class=student_class)
     attendances = Attendance.objects.filter(student__in=students).order_by('date')
 
-    return render(request, 'class_attendance.html', {
+    return render(request, 'students/class_attendance.html', {
         'student_class': student_class,
         'students': students,
         'attendances': attendances,
     })
+
 
 def add_student_to_class(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
@@ -214,3 +219,5 @@ def add_student_to_class(request, class_id):
     else:
         form = StudentForm()
     return render(request, 'students/add_student_to_class.html', {'form': form, 'student_class': student_class})
+
+

@@ -33,21 +33,6 @@
         <div class="d-flex justify-content-center mb-3">
             <a href="{% url 'add_student_to_class' student_class.id %}" class="btn btn-primary">Add Student to {{ student_class.name }}</a>
         </div>
-<<<<<<< HEAD
-    {% endif %}
-    
-    <form method="post" action="">
-        {% csrf_token %}
-        <ul>
-            {% for student, form in students %}
-                <li>
-                    {{ student.id }}: {{ student.name }}
-                    {{ form.non_field_errors }}
-                    <div class="form-group">
-                        {{ form.status.label_tag }} {{ form.status }}
-                        {{ form.student }}  
-                        {{ form.date }}     
-=======
 
         <!-- Display messages -->
         {% if messages %}
@@ -55,7 +40,6 @@
                 {% for message in messages %}
                     <div class="alert alert-{{ message.tags }}">
                         {{ message }}
->>>>>>> 99621fc99e9beeb9f09cd7a9a0e63e3f6181e519
                     </div>
                 {% endfor %}
             </div>

@@ -17,6 +17,9 @@
         .btn-custom {
             margin-top: 20px;
         }
+        a {
+            padding: 50px;
+        }
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -34,14 +37,16 @@
 </head>
 <body>
     {% include 'students/navbar.html' %}
-
     <div class="container">
         <h1 class="text-center">Class List</h1>
         <ul class="list-group">
             {% for student_class in classes %}
                 <li class="list-group-item">
                     <a href="{% url 'class_detail' student_class.id %}" class="text-decoration-none">{{ student_class.name }}</a>
+                    
+                    <a class="span" href="{% url 'class_attendance' student_class.id %}">View Attendance</a>
                 </li>
+
             {% endfor %}
         </ul>
         <div class="text-center">
