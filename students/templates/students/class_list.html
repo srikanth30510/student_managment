@@ -43,17 +43,9 @@
             {% for student_class in classes %}
                 <li class="list-group-item">
                     <a href="{% url 'class_detail' student_class.id %}" class="text-decoration-none">{{ student_class.name }}</a>
-<<<<<<< HEAD
+
                     
                     <a class="span" href="{% url 'class_attendance' student_class.id %}">View Attendance</a>
-                </li>
-
-=======
-
-                    <a href="{% url 'class_attendance' student_class.id %}" class="text-decoration-none">view Attendance</a>
-                </li>
-                
->>>>>>> 20f18aab6cbc045602926280f7f46b5a5977b5b4
             {% endfor %}
         </ul>
         <div class="text-center">
