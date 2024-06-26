@@ -72,6 +72,7 @@
                                 <tr>
                                     <th>Update</th>
                                     <th>Delete</th>
+                                    <th>View Attendance</th>
                                     <th>ID</th>
                                     <th>Name</th>
                                 </tr>
@@ -81,6 +82,7 @@
                                 <tr>
                                     <td><a class="btn btn-sm btn-info" href="{% url 'edit_student' student.pk %}">Update</a></td>
                                     <td><a class="btn btn-sm btn-danger" href="{% url 'confirm_delete' student.pk %}">Delete</a></td>
+                                    <td><a class="btn btn-sm btn-info" href="{% url 'attendance_view' student.id %}">view Attendance</a> </td>
                                     <td>{{ student.id }}</td>
                                     <td>{{ student.name }}</td>
                                 </tr>

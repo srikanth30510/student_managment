@@ -1,0 +1,31 @@
+<!-- templates/update_attendance.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Attendance</title>
+</head>
+<body>
+    <h1>Update Attendance for {{ class_instance.name }}</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ formset.management_form }}
+        <table>
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for form in formset %}
+                <tr>
+                    <td>{{ form.instance.student.name }}</td>
+                    <td>{{ form.status }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <button type="submit">Save Attendance</button>
+    </form>
+</body>
+</html>

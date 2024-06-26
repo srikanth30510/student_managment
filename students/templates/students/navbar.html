@@ -26,18 +26,22 @@
                 <li class="nav-item active">
                     <a class="nav-link text-dark" href="{% url 'student_list' %}">Student List <span class="sr-only"></span></a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="{% url 'register' %}">Status</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="#">Products</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-dark" href="{% url 'class_list' %}">Classes</a>
-                </li>
-                
+                <!-- Conditional Links -->
+               
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#">Status</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="#">Products</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'class_list' %}">Classes</a>
+                    </li>
+
+                    
             </ul>
         </div>
     </nav>
+    
 </body>
 </html>

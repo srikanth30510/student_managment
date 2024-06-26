@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Marks Submitted Successfully</title>
+</head>
+<body>
+    <h1>Marks Submitted Successfully for {{ student_class.name }}</h1>
+    <a href="{% url 'class_marks' student_class.id %}">Go back to marks page</a>
+</body>
+</html>

@@ -1,3 +1,4 @@
+from django.utils import timezone
 from django.db import models
 from django.shortcuts import render, get_object_or_404
 
@@ -32,7 +33,6 @@ class Mark(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
     subject = models.CharField(max_length=50)
     mark = models.IntegerField()
-
     def __str__(self):
         return f"{self.student.name} - {self.subject}"
 
@@ -42,7 +42,9 @@ class Attendance(models.Model):
     status = models.CharField(max_length=1, choices=[('P', 'Present'), ('A', 'Absent')])
 
     def __str__(self):
-        return f"{self.student.name} - {self.date} - {self.status}"
+        return f"{self.student.name} - {self.date} - {self.status}" 
+
+
     
 def class_details(request, class_id):
     student_class = get_object_or_404(Class, pk=class_id)

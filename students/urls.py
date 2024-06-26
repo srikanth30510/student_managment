@@ -8,7 +8,7 @@ urlpatterns = [
     path('navbar', views.navbar, name='navbar'),
     path('student_list/', views.student_list, name='student_list'),
     path('marks/<int:student_id>/', views.marks_view, name='marks_view'),
-    path('attendance/<int:student_id>/', views.attendance_view, name='attendance_view'),  
+    path('students/attendance/<int:student_id>/', views.attendance_view, name='attendance_view'),  
     path('timetable/<int:student_id>/', views.timetable_view, name='timetable_view'),
     path('classes/', views.class_list, name='class_list'),
     path('classes/<int:class_id>/', views.class_detail, name='class_detail'),
@@ -23,8 +23,15 @@ urlpatterns = [
     path('students/<int:student_id>/marks/', views.marks_view, name='marks_view'),
     path('students/edit_student/<int:pk>/', views.edit_student, name='edit_student'),
     path('students/confirm_delete/<int:pk>/', views.confirm_delete, name='confirm_delete'),
-
+    # path('classes/<int:class_id>/attendance/', views.class_attendance, name='class_attendance'),
     path('classes/<int:class_id>/attendance/', views.class_attendance, name='class_attendance'),
+    path('logout/', views.logout_view, name='logout'),
+
+    path('classes/<int:class_id>/attendance/', views.update_attendance_view, name='update_attendance'),
+
+    path('classes/<int:class_id>/marks/', views.class_marks, name='class_marks'),
+
+
 
    
 
