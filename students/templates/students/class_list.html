@@ -11,51 +11,73 @@
         .container {
             margin-top: 50px;
         }
-        .list-group-item:hover {
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
             background-color: #e9ecef;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
         }
         .btn-custom {
             margin-top: 20px;
         }
-        a {
-            padding: 50px;
+        .action-links a {
+            margin-right: 10px;
+            color: #007bff;
+            text-decoration: none;
+        }
+        .action-links a:hover {
+            text-decoration: underline;
         }
     </style>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const items = document.querySelectorAll('.list-group-item');
-            items.forEach(item => {
-                item.addEventListener('mouseover', () => {
-                    item.classList.add('active');
-                });
-                item.addEventListener('mouseout', () => {
-                    item.classList.remove('active');
-                });
-            });
-        });
-    </script>
 </head>
 <body>
     {% include 'students/navbar.html' %}
     <div class="container">
         <h1 class="text-center">Class List</h1>
-        <ul class="list-group">
-            {% for student_class in classes %}
-                <li class="list-group-item">
-                    <a href="{% url 'class_detail' student_class.id %}" class="text-decoration-none">{{ student_class.name }}</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Class Name</th>
+                    <th>student list </th>
+                    <th>Take Attendance</th>
+                    <th>View Attendance</th>
+                    <th>Add Marks</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student_class in classes %}
+                <tr>
+                    <td>{{ student_class.name }}</td>
+                    <td>
+                        <a href="{% url 'class_student_list' student_class.id %}">View Students of {{student_class.name}}</a></td>
+                     <td>   <a href="{% url 'class_detail' student_class.id %}">Take Attendance for {{student_class.name}}</a></td>
+                    <td>   <a href="{% url 'class_attendance' student_class.id %}">View Attendance of {{student_class.name}}</a> </td> 
+                      <td>  <a href="{% url 'class_marks' student_class.id %}">Add Marks of {{student_class.name}}</a></td>
 
                     
-                    <a class="span" href="{% url 'class_attendance' student_class.id %}">View Attendance</a>
+                     <td> <a href="{% url 'confirm_delete_class' student_class.id %}" class="text-danger">Delete class {{student_class.name}}</a></td>
+                </tr>
 
-                    <a class="span" href="{% url 'update_attendance' student_class.id %}">Update Attendance</a>
-
-                    <a class="span" href="{% url 'class_marks' student_class.id %}">ADD MARKS</a>
-            {% endfor %}
-        </ul>
+                {% endfor %}
+            </tbody>
+        </table>
         <div class="text-center">
             <a href="{% url 'add_class' %}" class="btn btn-primary btn-custom">Add Class</a>
         </div>
     </div>
-
 </body>
 </html>

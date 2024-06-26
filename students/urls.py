@@ -27,10 +27,15 @@ urlpatterns = [
     path('classes/<int:class_id>/attendance/', views.class_attendance, name='class_attendance'),
     path('logout/', views.logout_view, name='logout'),
 
-    path('classes/<int:class_id>/attendance/', views.update_attendance_view, name='update_attendance'),
 
     path('classes/<int:class_id>/marks/', views.class_marks, name='class_marks'),
 
+
+    path('students/class/<int:class_id>/', views.class_student_list, name='class_student_list'),
+
+    path('confirm_delete_class/<int:class_id>/', views.confirm_delete_class, name='confirm_delete_class'),
+
+    path('edit_student_attendance/<int:student_id>/<str:date>/', views.edit_student_attendance, name='edit_student_attendance'),
 
 
    

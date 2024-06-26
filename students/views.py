@@ -220,28 +220,6 @@ def add_student_to_class(request, class_id):
     return render(request, 'students/add_student_to_class.html', {'form': form, 'student_class': student_class})
 
 
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Class, Attendance, Student
-from .forms import AttendanceFormSet
-
-def update_attendance_view(request, class_id):
-    class_instance = get_object_or_404(Class, id=class_id)
-    students = Student.objects.filter(class_instance=class_instance)
-
-    # Fetch existing attendance records or create new ones if they don't exist
-    attendance_records = [Attendance.objects.get_or_create(student=student, date=date.today())[0] for student in students]
-
-    if request.method == 'POST':
-        formset = AttendanceFormSet(request.POST, queryset=Attendance.objects.filter(student__in=students, date=date.today()))
-        if formset.is_valid():
-            formset.save()
-            return redirect('attendance_success')  # Redirect to a success page or similar
-    else:
-        formset = AttendanceFormSet(queryset=Attendance.objects.filter(student__in=students, date=date.today()))
-
-    return render(request, 'students/update_attendance.html', {'class_instance': class_instance, 'formset': formset})
-
 
 # views.py
 # views.py
@@ -365,3 +343,51 @@ def class_marks(request, class_id):
         'student_class': student_class,
         'students': forms
     })
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Class, Student
+
+def class_student_list(request, class_id):
+    student_class = get_object_or_404(Class, id=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    
+    return render(request, 'students/class_student_list.html', {
+        'student_class': student_class,
+        'students': students
+    })
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Class
+
+def confirm_delete_class(request, class_id):
+    student_class = get_object_or_404(Class, id=class_id)
+    if request.method == 'POST':
+        student_class.delete()
+        messages.success(request, 'Class deleted successfully.')
+        return redirect('class_list')  # Replace 'class_list' with your actual class list view name
+    return render(request, 'students/confirm_delete_class.html', {'student_class': student_class})
+
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Student, Attendance
+from .forms import AttendanceForm
+from datetime import datetime
+
+def edit_student_attendance(request, student_id, date):
+    student = get_object_or_404(Student, id=student_id)
+    attendance_date = datetime.strptime(date, '%Y-%m-%d').date()
+    attendance = Attendance.objects.filter(student=student, date=attendance_date).first()
+
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST, instance=attendance)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f'Attendance updated successfully for {student.name}.')
+            return redirect('class_detail', class_id=student.student_class.id)
+    else:
+        form = AttendanceForm(instance=attendance)
+
+    return render(request, 'students/edit_student_attendance.html', {'student': student, 'form': form, 'date': attendance_date})
