@@ -67,6 +67,7 @@
                     <tr>
                         <td>{{ attendance.date }}</td>
                         <td>{{ attendance.status }}</td>
+
                         <!-- Add more columns if needed -->
                     </tr>
                     {% empty %}
@@ -76,6 +77,8 @@
                     {% endfor %}
                 </tbody>
             </table>
+            <a href="{% url 'class_list' %}" class="btn btn-secondary btn-block">Back to Class List</a>
+
         </div>
     </div>
 </body>

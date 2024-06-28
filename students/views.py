@@ -308,6 +308,14 @@ from django.contrib import messages
 from .models import Class, Student, Mark
 from .forms import MarkForm
 
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.urls import reverse
+from django.contrib import messages
+from .models import Class, Student, Mark
+from .forms import MarkForm
+
 def class_marks(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
     students = Student.objects.filter(student_class=student_class)
@@ -321,15 +329,15 @@ def class_marks(request, class_id):
         all_valid = True
         for student, form in forms:
             if form.is_valid():
-                form.save(commit=False)  # Save the form instance if valid
+                mark = form.save(commit=False)  # Create form instance but don't save to database
+                mark.student = student  # Assign the student to the mark instance
+                mark.save()
             else:
                 all_valid = False
                 # Print errors to console for debugging
                 print(form.errors)
         
         if all_valid:
-            for student, form in forms:
-                form.save()  # Save the form with commit=True to save to database
             messages.success(request, "Marks submitted successfully!")
             return HttpResponseRedirect(reverse('class_marks', args=[class_id]))
     
@@ -343,6 +351,7 @@ def class_marks(request, class_id):
         'student_class': student_class,
         'students': forms
     })
+
 
 
 from django.shortcuts import render, get_object_or_404
@@ -391,3 +400,97 @@ def edit_student_attendance(request, student_id, date):
         form = AttendanceForm(instance=attendance)
 
     return render(request, 'students/edit_student_attendance.html', {'student': student, 'form': form, 'date': attendance_date})
+
+
+from django.shortcuts import render, get_object_or_404
+from .models import Class, Student, Mark
+
+def class_marks_view(request, class_id):
+    student_class = get_object_or_404(Class, id=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    
+    # Fetch marks for all students in the class
+    marks = Mark.objects.filter(student__in=students)
+    
+    return render(request, 'students/class_marks_view.html', {
+        'student_class': student_class,
+        'students': students,
+        'marks': marks  # Pass marks to the template
+    })
+# views.py
+from django.shortcuts import get_object_or_404, redirect, render
+from django.contrib import messages
+from .models import Student, Attendance
+from .forms import AttendanceForm
+
+def attendance_update(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    
+    if request.method == 'POST':
+        form = AttendanceForm(request.POST)
+        if form.is_valid():
+            # Process valid form data
+            status = form.cleaned_data['status']
+            date = form.cleaned_data['date']
+            
+            try:
+                attendances = Attendance.objects.filter(student=student)
+                for attendance in attendances:
+                    attendance.status = status
+                    attendance.date = date
+                    attendance.save()
+                
+                messages.success(request, 'Attendance updated successfully.')
+            except Attendance.DoesNotExist:
+                messages.error(request, 'Attendance not found for this student.')
+            
+            return redirect('class_student_list', class_id=student.student_class.id)
+    else:
+        # Handle GET request or form initialization
+        form = AttendanceForm()
+    
+    # Render the template with the form
+    return render(request, 'students/attendance_update.html', {'form': form, 'student': student})
+
+# views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Student, Mark
+
+def marks_update(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    marks = Mark.objects.filter(student=student)
+    
+    if request.method == 'POST':
+        for mark in marks:
+            new_mark = request.POST.get(str(mark.id), None)
+            if new_mark is not None:
+                mark.mark = new_mark
+                mark.save()
+
+        messages.success(request, 'Updated Marks successfully.')
+
+        return redirect('marks_update', student_id=student.id)
+    
+    return render(request, 'students/marks_update.html', {'student': student, 'marks': marks})
+
+
+# views.py
+# views.py
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Mark
+
+def delete_mark(request, mark_id):
+    mark = get_object_or_404(Mark, id=mark_id)
+    
+    if request.method == 'POST':
+        student_class_id = mark.student.student_class.id if mark.student and mark.student.student_class else None
+        mark.delete()
+        if student_class_id:
+            return redirect('marks_view', student_class_id=student_class_id)
+        else:
+            # Handle error or redirect to an appropriate page
+            return redirect('class_list')  # Example fallback redirection
+        
+    return render(request, 'students/delete_mark.html', {'mark': mark})

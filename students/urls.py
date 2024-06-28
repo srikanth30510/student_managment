@@ -38,7 +38,20 @@ urlpatterns = [
     path('edit_student_attendance/<int:student_id>/<str:date>/', views.edit_student_attendance, name='edit_student_attendance'),
 
 
-   
+    path('class_marks/<int:class_id>/', views.class_marks, name='class_marks'),
 
+    path('class_marks_view/<int:class_id>/', views.class_marks_view, name='class_marks_view'),
+
+# urls.py
+path('students/attendance_update/<int:student_id>/', views.attendance_update, name='attendance_update'),
+    path('students/marks_update/<int:student_id>/', views.marks_update, name='marks_update'),
+
+    path('delete_mark/<int:mark_id>/delete/', views.delete_mark, name='delete_mark'),
+
+
+
+
+
+    
     
 ]

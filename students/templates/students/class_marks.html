@@ -1,38 +1,87 @@
-<!-- templates/students/class_detail.html -->
+<!-- templates/students/class_marks.html -->
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Class Detail</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Marks Entry</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Light gray background */
+            padding-top: 0px; /* Ensure content doesn't overlap with navbar */
+        }
+        .container {
+            background-color: #ffffff; /* White background for main content */
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #343a40; /* Dark text color */
+        }
+        .messages {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+        .messages li {
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff; /* Blue primary button color */
+            border-color: #007bff; /* Blue primary button border color */
+        }
+        .btn-primary:hover {
+            background-color: #0069d9; /* Darker shade on hover */
+            border-color: #0062cc; /* Darker shade on hover */
+        }
+        .table {
+            margin-top: 20px; /* Space above the table */
+        }
+    </style>
 </head>
 <body>
-    <h1>Class Detail - {{ student_class.name }}</h1>
-    
-    <form method="post">
-        {% csrf_token %}
-        {% for student, form in students %}
-        <h2>{{ student.name }}</h2>
-        {{ form.management_form }}
-        {{ form.non_field_errors }}
-        <table>
-            <tbody>
-                <tr>
-                    <th><label for="{{ form.subject.id_for_label }}">Subject:</label></th>
-                    <td>{{ form.subject }}</td>
-                    <td>{{ form.subject.errors }}</td>
-                </tr>
-                <tr>
-                    <th><label for="{{ form.mark.id_for_label }}">Mark:</label></th>
-                    <td>{{ form.mark }}</td>
-                    <td>{{ form.mark.errors }}</td>
-                </tr>
-            </tbody>
-        </table>
-        {% endfor %}
-        <button type="submit">Save Marks</button>
+    {% include 'students/navbar.html' %}
 
-        <a href="{% url 'class_list' %}" class="btn btn-secondary btn-block">Back to Class List</a>
+    <div class="container mt-5">
+        <h1 class="text-center">Class Marks Entry</h1>
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li class="alert alert-{{ message.tags }} mb-3" role="alert">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        <form method="post" action="{% url 'class_marks' student_class.id %}">
+            {% csrf_token %}
+            <table class="table table-bordered mt-4">
+                <thead class="table-light">
+                    <tr>
+                        <th scope="col">Student Name</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Mark</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student, form in students %}
+                        <tr>
+                            <td>{{ student.name }}</td>
+                            <td>{{ form.subject }}</td>
+                            <td>{{ form.mark }}</td>
 
-    </form>
-    
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <div class="text-end mt-3">
+                <button type="submit" class="btn btn-primary">Submit Marks</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

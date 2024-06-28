@@ -1,83 +1,91 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class List</title>
+    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
-            background-color: #f8f9fa;
+            background-color: #f8f9fa; /* Light gray background */
         }
         .container {
             margin-top: 50px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 15px;
-            border: 1px solid #ddd;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #e9ecef;
-        }
         h1 {
             font-size: 2.5rem;
             margin-bottom: 20px;
+            color: #343a40; /* Dark text color */
+            text-align: center;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px; /* Adjusted padding for better spacing */
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2; /* Light gray background for header */
+        }
+        tr:hover {
+            background-color: #e9ecef; /* Light gray background on hover */
         }
         .btn-custom {
             margin-top: 20px;
         }
         .action-links a {
-            margin-right: 10px;
-            color: #007bff;
+            color: #007bff; /* Blue link color */
             text-decoration: none;
+            margin-right: 10px;
         }
         .action-links a:hover {
-            text-decoration: underline;
+            text-decoration: underline; /* Underline on hover */
         }
     </style>
 </head>
 <body>
     {% include 'students/navbar.html' %}
+
     <div class="container">
-        <h1 class="text-center">Class List</h1>
-        <table class="table table-striped">
-            <thead>
+        <h1>Class List</h1>
+
+        <table class="table table-striped table-bordered">
+            <thead class="table-light">
                 <tr>
                     <th>Class Name</th>
-                    <th>student list </th>
-                    <th>Take Attendance</th>
-                    <th>View Attendance</th>
-                    <th>Add Marks</th>
-                    <th>Delete</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for student_class in classes %}
                 <tr>
                     <td>{{ student_class.name }}</td>
-                    <td>
-                        <a href="{% url 'class_student_list' student_class.id %}">View Students of {{student_class.name}}</a></td>
-                     <td>   <a href="{% url 'class_detail' student_class.id %}">Take Attendance for {{student_class.name}}</a></td>
-                    <td>   <a href="{% url 'class_attendance' student_class.id %}">View Attendance of {{student_class.name}}</a> </td> 
-                      <td>  <a href="{% url 'class_marks' student_class.id %}">Add Marks of {{student_class.name}}</a></td>
+                    <td class="action-links">
+                        <a href="{% url 'class_student_list' student_class.id %}" class="btn btn-sm btn-outline-secondary">View Students</a>
+                        <a href="{% url 'class_detail' student_class.id %}" class="btn btn-sm btn-outline-primary">Take Attendance</a>
+                        <a href="{% url 'class_attendance' student_class.id %}" class="btn btn-sm btn-outline-info">View Attendance</a>
+                        <a href="{% url 'class_marks' student_class.id %}" class="btn btn-sm btn-outline-success">Add Marks</a>
+                        <a href="{% url 'class_marks_view' student_class.id %}" class="btn btn-sm btn-outline-warning">View Marks</a>
 
-                    
-                     <td> <a href="{% url 'confirm_delete_class' student_class.id %}" class="text-danger">Delete class {{student_class.name}}</a></td>
+
+                        <a href="{% url 'confirm_delete_class' student_class.id %}" class="btn btn-sm btn-outline-danger">Delete Class</a>
+                    </td>
                 </tr>
-
                 {% endfor %}
             </tbody>
         </table>
+
         <div class="text-center">
             <a href="{% url 'add_class' %}" class="btn btn-primary btn-custom">Add Class</a>
         </div>
     </div>
+
 </body>
 </html>

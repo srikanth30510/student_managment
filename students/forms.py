@@ -40,6 +40,5 @@ AttendanceFormSet = modelformset_factory(Attendance, fields=('student', 'status'
 class MarkForm(forms.ModelForm):
     class Meta:
         model = Mark
-        fields = ['student', 'subject', 'mark']
-
+        fields = [ 'subject', 'mark'] 
     
