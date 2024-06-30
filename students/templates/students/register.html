@@ -5,14 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .register-container {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        .register-container h2 {
+            margin-bottom: 20px;
+            color: #333;
+            text-align: center;
+        }
+        .form-control {
+            background: #f7f7f7;
+            border: 1px solid #ced4da;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        .form-control:focus {
+            background: #ffffff;
+            box-shadow: none;
+            border-color: #80bdff;
+        }
+        .btn-primary {
+            background: #007bff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+        }
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+        .alert {
+            margin-top: 10px;
+            background-color: rgba(255, 69, 58, 0.7);
+            border: none;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
+    <div class="register-container">
         <h2>Register</h2>
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert">
+                Please correct the errors below.
+            </div>
+        {% endif %}
         <form method="post">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn btn-primary">Register</button>
+            <button type="submit" class="btn btn-primary w-100">Register</button>
+            <a href="{% url 'login' %}">If you have account,CLICK HERE TO LOGIN</a>
         </form>
     </div>
 </body>

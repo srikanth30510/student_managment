@@ -42,3 +42,10 @@ class MarkForm(forms.ModelForm):
         model = Mark
         fields = [ 'subject', 'mark'] 
     
+class UpdateAttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['status', 'date']
+        widgets = {
+            'date': forms.DateInput(attrs={'type': 'date'})
+        }

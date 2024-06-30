@@ -71,12 +71,15 @@
                         <a href="{% url 'class_student_list' student_class.id %}" class="btn btn-sm btn-outline-secondary">View Students</a>
                         <a href="{% url 'class_detail' student_class.id %}" class="btn btn-sm btn-outline-primary">Take Attendance</a>
                         <a href="{% url 'class_attendance' student_class.id %}" class="btn btn-sm btn-outline-info">View Attendance</a>
+
+
                         <a href="{% url 'class_marks' student_class.id %}" class="btn btn-sm btn-outline-success">Add Marks</a>
+
                         <a href="{% url 'class_marks_view' student_class.id %}" class="btn btn-sm btn-outline-warning">View Marks</a>
 
 
                         <a href="{% url 'confirm_delete_class' student_class.id %}" class="btn btn-sm btn-outline-danger">Delete Class</a>
-                    </td>
+                       
                 </tr>
                 {% endfor %}
             </tbody>

@@ -9,20 +9,70 @@
     <style>
         body {
             background-color: #f8f9fa;
+            font-family: Arial, sans-serif;
         }
         .table thead th {
             background-color: #343a40;
             color: white;
+            border-color: #343a40;
         }
         .card {
             margin-top: 20px;
+            border: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
         .btn-block {
             display: block;
             width: 100%;
         }
+        .card-body {
+            padding: 1.25rem;
+        }
         .card-body table {
-            margin: 0;
+            margin-bottom: 0;
+        }
+        .btn-primary, .btn-info, .btn-danger {
+            color: #fff;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0069d9;
+            border-color: #0062cc;
+        }
+        .btn-info {
+            background-color: #17a2b8;
+            border-color: #17a2b8;
+        }
+        .btn-info:hover {
+            background-color: #117a8b;
+            border-color: #10707f;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        .btn-danger:hover {
+            background-color: #bd2130;
+            border-color: #b21f2d;
+        }
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.875rem;
+        }
+        .btn-sm.btn-block {
+            width: auto;
+        }
+        .btn-sm.btn-block + .btn-sm.btn-block {
+            margin-top: 0.5rem;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-5 {
+            margin-top: 3rem;
         }
     </style>
 </head>
@@ -50,12 +100,16 @@
                             <td>{{ student.name }}</td>
                             <td>{{ student.student_class }}</td>
                         </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4">No students available.</td>
+                        </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         {% else %}
-            <p>No students available.</p>
+            <p class="text-center mt-3">No students available.</p>
         {% endif %}
     </div>
 
@@ -83,10 +137,14 @@
                                 <tr>
                                     <td><a class="btn btn-sm btn-info" href="{% url 'edit_student' student.pk %}">Update</a></td>
                                     <td><a class="btn btn-sm btn-danger" href="{% url 'confirm_delete' student.pk %}">Delete</a></td>
-                                    <td><a class="btn btn-sm btn-info" href="{% url 'attendance_view' student.id %}">view Attendance</a> </td>
-                                    <td><a class="btn btn-sm btn-info" href="{% url 'marks_view' student.id %}">view Marks</a></td>
+                                    <td><a class="btn btn-sm btn-info" href="{% url 'attendance_view' student.id %}">View Attendance</a></td>
+                                    <td><a class="btn btn-sm btn-info" href="{% url 'marks_view' student.id %}">View Marks</a></td>
                                     <td>{{ student.id }}</td>
                                     <td>{{ student.name }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="6" class="text-center">No students found.</td>
                                 </tr>
                                 {% endfor %}
                             </tbody>
