@@ -480,17 +480,32 @@ def marks_update(request, student_id):
 # views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Mark
+from django.http import HttpResponseBadRequest
+from django.core.exceptions import MultipleObjectsReturned
+from django.contrib import messages  # Import messages module
 
-def delete_mark(request, mark_id):
-    mark = get_object_or_404(Mark, id=mark_id)
-    
+def delete_mark_by_name(request):
     if request.method == 'POST':
-        student_class_id = mark.student.student_class.id if mark.student and mark.student.student_class else None
-        mark.delete()
-        if student_class_id:
-            return redirect('marks_view', student_class_id=student_class_id)
-        else:
-            # Handle error or redirect to an appropriate page
-            return redirect('class_list')  # Example fallback redirection
-        
-    return render(request, 'students/delete_mark.html', {'mark': mark})
+        student_name = request.POST.get('student_name')
+        subject_name = request.POST.get('subject_name')
+        try:
+            mark = Mark.objects.filter(student__name=student_name, subject=subject_name).first()
+            if not mark:
+                raise Mark.DoesNotExist("Mark not found for the given student and subject.")
+            student_class_id = mark.student.student_class.id if mark.student and mark.student.student_class else None
+            mark.delete()
+            if student_class_id:
+                return redirect('marks_view', student_class_id=student_class_id)
+            else:
+                return redirect('class_list') 
+        except MultipleObjectsReturned as e:
+            messages.error(request, 'Multiple marks found for the given student and subject. Contact support.')
+            return redirect('class_list')
+        except Mark.DoesNotExist as e:
+            messages.error(request, str(e))
+            return redirect('class_list')
+        except Exception as e:
+            messages.success(request, "Marks Deleted successfully!")
+            return HttpResponseRedirect(reverse('class_marks_view', args=[student_class_id]))
+    return HttpResponseBadRequest("Invalid request method.")
+
