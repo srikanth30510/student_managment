@@ -1,10 +1,16 @@
 from django.urls import path
 from . import views
+from django.conf import settings
+from django.conf.urls import handler403
+from django.conf.urls.static import static
+
+
+handler403 = views.permission_denied_view
 
 urlpatterns = [
     path('register/', views.register, name='register'),
-    path('login/', views.login_view, name='login'),
-    path('',views.home,name='home'),
+    path('', views.login_view, name='login'),
+    path('home/',views.home,name='home'),
     path('navbar', views.navbar, name='navbar'),
     path('student_list/', views.student_list, name='student_list'),
     path('marks/<int:student_id>/', views.marks_view, name='marks_view'),
@@ -43,11 +49,17 @@ urlpatterns = [
     path('class_marks_view/<int:class_id>/', views.class_marks_view, name='class_marks_view'),
 
 # urls.py
-path('students/attendance_update/<int:student_id>/', views.attendance_update, name='attendance_update'),
+    path('students/<int:student_id>/attendance_update/', views.attendance_update, name='attendance_update'),
+
     path('students/marks_update/<int:student_id>/', views.marks_update, name='marks_update'),
 
+<<<<<<< HEAD
     # path('delete_mark/<int:mark_id>/delete/', views.delete_mark, name='delete_mark'),
     path('delete_mark_by_name/', views.delete_mark_by_name, name='delete_mark_by_name'),
+=======
+    path('delete_mark/<int:mark_id>/', views.delete_mark, name='delete_mark'),
+
+>>>>>>> ad6e5b7a062d8e9f208d5036c41f56d30ebd7f44
 
 
 
@@ -57,3 +69,7 @@ path('students/attendance_update/<int:student_id>/', views.attendance_update, na
     
     
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

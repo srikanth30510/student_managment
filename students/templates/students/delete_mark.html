@@ -1,4 +1,3 @@
-<!-- templates/students/mark_delete_confirm.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,13 +14,11 @@
         <h1>Delete Mark</h1>
         <p>Are you sure you want to delete the mark for {{ mark.student.name }} in {{ mark.subject }}?</p>
         
-        <!-- mark_delete_confirm.html -->
-<form method="post">
-    {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Delete</button>
-    <a href="{% url 'class_list' %}" class="btn btn-secondary">Cancel</a>
-</form>
-
+        <form method="post" action="{% url 'delete_mark' mark.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Delete</button>
+            <a href="{% url 'class_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
     </div>
 
     <!-- Bootstrap Bundle with Popper -->
