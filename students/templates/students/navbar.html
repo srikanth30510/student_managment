@@ -22,23 +22,38 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-            
-            <ul class="navbar-nav">
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item active">
                     <a class="nav-link text-dark" href="{% url 'student_list' %}">Student List <span class="sr-only"></span></a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#">Status</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="#">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark" href="{% url 'class_list' %}">Classes</a>
+                </li>
+            </ul>
+            <ul class="navbar-nav">
+                {% if user.is_authenticated %}
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="#">Status</a>
+                        <span class="nav-link text-dark">Welcome, {{ user.username }}</span>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="#">Products</a>
+                        <a class="nav-link text-dark" href="{% url 'login' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'login' %}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link text-dark" href="{% url 'class_list' %}">Classes</a>
+                        <a class="nav-link text-dark" href="{% url 'register' %}">Register</a>
                     </li>
+                {% endif %}
             </ul>
         </div>
     </nav>
-    
 </body>
 </html>

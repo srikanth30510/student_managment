@@ -3,7 +3,7 @@ from datetime import date
 import json
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import redirect, render, get_object_or_404
-from .forms import ClassForm, StudentForm, AttendanceForm,SignUpForm
+from .forms import ClassForm, StudentForm, AttendanceForm,SignUpForm, UpdateAttendanceForm
 from .models import Student, Timetable, Mark, Attendance, Class
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
@@ -17,34 +17,45 @@ def home(request):
     students = Student.objects.all()
     return render(request, 'students/home.html', {'students': students})
 
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
+from .forms import SignUpForm
+
 def register(request):
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
             form.save()
-            username=form.cleaned_data.get('username')
-            password=form.cleaned_data.get('password1')
-            user=authenticate(username=username,password=password)
-            login(request,user)
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            login(request, user)
             return redirect('login')
-        else:
-            form=SignUpForm()
-        return render(request,'students/register.html',{'form':form})
+    else:
+        form = SignUpForm()
     
+    return render(request, 'students/register.html', {'form': form})
+
+    
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import AuthenticationForm
+
 def login_view(request):
     if request.method == 'POST':
-        form =AuthenticationForm(request,data=request.POST)
+        form = AuthenticationForm(request, data=request.POST)
         if form.is_valid():
-            username=form.cleaned_data.get('username')
-            password=form.cleaned_data.get('password')
-            user=authenticate(username=username,password=password)
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
             if user is not None:
-                login(request,user)
+                login(request, user)
                 return redirect('home')
-            else:
-                form=AuthenticationForm()
-            return render(request,'students/login.html',{'form': form})
-        
+    else:
+        form = AuthenticationForm()
+
+    return render(request, 'students/login.html', {'form': form})
+
 def logout_view(request):
     logout(request)
     return redirect('home')
@@ -62,11 +73,30 @@ def marks_view(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     marks = Mark.objects.filter(student=student)
     return render(request, 'students/marks_view.html', {'marks': marks, 'student': student})
+from django.shortcuts import render, get_object_or_404
+from .models import Student, Attendance
 
 def attendance_view(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     attendances = Attendance.objects.filter(student=student)
-    return render(request, 'students/attendance_view.html', {'attendances': attendances, 'student': student})
+    
+    total_conducted = attendances.count()
+    total_present = attendances.filter(status='P').count()
+    total_absent = attendances.filter(status='A').count()
+    attendance_percentage = round((total_present / total_conducted) * 100,0 ) if total_conducted > 0 else 0
+
+    context = {
+        'attendances': attendances,
+        'student': student,
+        'total_conducted': total_conducted,
+        'total_present': total_present,
+        'total_absent': total_absent,
+        'attendance_percentage': attendance_percentage
+    }
+    
+    return render(request, 'students/attendance_view.html', context)
+
+
 
 def class_list(request):
     classes = Class.objects.all()
@@ -197,12 +227,26 @@ def submit_attendance(request):
 def class_attendance(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
     students = Student.objects.filter(student_class=student_class)
-    attendances = Attendance.objects.filter(student__in=students).order_by('date')
+    
+    attendance_data = []
+    for student in students:
+        attendances = Attendance.objects.filter(student=student)
+        total_conducted = attendances.count()
+        total_present = attendances.filter(status='P').count()
+        total_absent = attendances.filter(status='A').count()
+        attendance_percentage = (total_present / total_conducted) * 100 if total_conducted > 0 else 0
+        
+        attendance_data.append({
+            'student': student,
+            'total_conducted': total_conducted,
+            'total_present': total_present,
+            'total_absent': total_absent,
+            'attendance_percentage': attendance_percentage,
+        })
 
     return render(request, 'students/class_attendance.html', {
         'student_class': student_class,
-        'students': students,
-        'attendances': attendances,
+        'attendance_data': attendance_data,
     })
 
 
@@ -417,40 +461,45 @@ def class_marks_view(request, class_id):
         'students': students,
         'marks': marks  # Pass marks to the template
     })
-# views.py
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Student, Attendance
 from .forms import AttendanceForm
+from datetime import date
 
 def attendance_update(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     
     if request.method == 'POST':
-        form = AttendanceForm(request.POST)
+        form = UpdateAttendanceForm(request.POST)
         if form.is_valid():
-            # Process valid form data
             status = form.cleaned_data['status']
             date = form.cleaned_data['date']
             
+            # Check if attendance for this student on this date already exists
             try:
-                attendances = Attendance.objects.filter(student=student)
-                for attendance in attendances:
-                    attendance.status = status
-                    attendance.date = date
-                    attendance.save()
+                attendance = Attendance.objects.get(student=student, date=date)
+                
+                # Update existing attendance record
+                attendance.status = status
+                attendance.save()
                 
                 messages.success(request, 'Attendance updated successfully.')
             except Attendance.DoesNotExist:
-                messages.error(request, 'Attendance not found for this student.')
+                # Create new attendance record if none exists for this date
+                attendance = Attendance(student=student, date=date, status=status)
+                attendance.save()
+                
+                messages.success(request, 'Attendance recorded successfully.')
             
             return redirect('class_student_list', class_id=student.student_class.id)
     else:
         # Handle GET request or form initialization
-        form = AttendanceForm()
+        form = UpdateAttendanceForm()
     
     # Render the template with the form
     return render(request, 'students/attendance_update.html', {'form': form, 'student': student})
+
 
 # views.py
 
@@ -508,4 +557,6 @@ def delete_mark_by_name(request):
             messages.success(request, "Marks Deleted successfully!")
             return HttpResponseRedirect(reverse('class_marks_view', args=[student_class_id]))
     return HttpResponseBadRequest("Invalid request method.")
+
+
 

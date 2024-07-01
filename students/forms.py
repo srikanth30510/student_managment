@@ -1,5 +1,5 @@
 from django import forms
-from .models import Attendance,Student,Class,Mark
+from .models import Attendance,Student,Class,Mark, Timetable
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -49,3 +49,8 @@ class UpdateAttendanceForm(forms.ModelForm):
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'})
         }
+
+class TimetableForm(forms.ModelForm):
+    class Meta:
+        model = Timetable
+        fields = '__all__'

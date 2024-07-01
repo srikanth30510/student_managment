@@ -46,6 +46,7 @@
                 <tr>
                     <th scope="col">Subject</th>
                     <th scope="col">Mark</th>
+                    
                 </tr>
             </thead>
             <tbody>
@@ -53,7 +54,6 @@
                 <tr>
                     <td>{{ mark.subject }}</td>
                     <td>{{ mark.mark }}</td>
-                    <td>  <a href="{% url 'delete_mark' student.id %}" class="btn btn-sm btn-outline-warning">Delete Row</a></td>
 
                 </tr>
                 {% empty %}

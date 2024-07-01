@@ -19,15 +19,7 @@ class Student(models.Model):
     def __str__(self):
         return self.name
     
-class Timetable(models.Model):
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    day = models.CharField(max_length=10)
-    subject = models.CharField(max_length=50)
-    start_time = models.TimeField()
-    end_time = models.TimeField()
 
-    def __str__(self):
-        return f"{self.day} - {self.subject} - {self.start_time} - {self.end_time}"
     
 class Mark(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
@@ -60,3 +52,15 @@ def class_details(request, class_id):
         'students': students,
         'attendance_forms': attendance_forms,
     })
+
+
+
+class Timetable(models.Model):
+    day = models.CharField(max_length=50)
+    time = models.TimeField()
+    subject = models.CharField(max_length=100)
+    teacher = models.CharField(max_length=100)
+    student_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='timetables')
+
+    def __str__(self):
+        return f"{self.day} - {self.time} - {self.subject} - {self.teacher}"
