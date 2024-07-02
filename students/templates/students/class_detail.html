@@ -214,6 +214,10 @@
         .alert {
             margin-top: 20px;
         }
+        .table-responsive{
+            margin-top: 10px;
+        }
+        
     </style>
 </head>
 <body>
@@ -237,17 +241,25 @@
 
         <form method="post" action="">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="date">Select Date:</label>
-                <input type="date" name="date" id="date" class="form-control" required>
-            </div>
-            <div class="form-group">
-                <label for="period">Select Period:</label>
-                <select name="period" id="period" class="form-control" required>
-                    {% for period in periods %}
-                        <option value="{{ period.id }}">{{ period.name }} ({{ period.start_time }} - {{ period.end_time }})</option>
-                    {% endfor %}
-                </select>
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="date">Select Date:</label>
+                            <input type="date" name="date" id="date" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="period">Select Period:</label>
+                            <select name="period" id="period" class="form-control" required>
+                                {% for period in periods %}
+                                    <option value="{{ period.id }}">{{ period.name }} ({{ period.start_time }} - {{ period.end_time }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="table-responsive">
                 <table class="table table-bordered">
