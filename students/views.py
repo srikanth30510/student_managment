@@ -469,7 +469,6 @@ from datetime import date
 
 def attendance_update(request, student_id):
     student = get_object_or_404(Student, id=student_id)
-    
     if request.method == 'POST':
         form = UpdateAttendanceForm(request.POST)
         if form.is_valid():
