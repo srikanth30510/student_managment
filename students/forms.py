@@ -42,15 +42,37 @@ class MarkForm(forms.ModelForm):
         model = Mark
         fields = [ 'subject', 'mark'] 
     
+# class UpdateAttendanceForm(forms.ModelForm):
+#     class Meta:
+#         model = Attendance
+#         fields = ['status', 'date']
+#         widgets = {
+#             'date': forms.DateInput(attrs={'type': 'date'})
+#         }
+# forms.py
 class UpdateAttendanceForm(forms.ModelForm):
     class Meta:
         model = Attendance
-        fields = ['status', 'date']
+        fields = ['status', 'date', 'period']
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'})
+            'date': forms.DateInput(attrs={'type': 'date'}),
+            'period': forms.Select()
         }
+
 
 class TimetableForm(forms.ModelForm):
     class Meta:
         model = Timetable
         fields = '__all__'
+
+from .models import Attendance, Period
+
+class AttendanceForm(forms.ModelForm):
+    class Meta:
+        model = Attendance
+        fields = ['student', 'date', 'period', 'status']
+        widgets = {
+            'student': forms.HiddenInput(),
+            'date': forms.HiddenInput(),
+            'period': forms.HiddenInput(),
+        }

@@ -161,13 +161,15 @@
                         <tr>
                             <th>Date</th>
                             <th>Status</th>
+                            <th>Period</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for attendance in attendances %}
                         <tr>
                             <td>{{ attendance.date }}</td>
-                            <td>{{ attendance.status }}</td>
+                            <td>{{ attendance.status}}</td>
+                            <td>{{attendance.period.name}}</td>
                         </tr>
                         {% empty %}
                         <tr>

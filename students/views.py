@@ -81,8 +81,8 @@ def attendance_view(request, student_id):
     attendances = Attendance.objects.filter(student=student)
     
     total_conducted = attendances.count()
-    total_present = attendances.filter(status='P').count()
-    total_absent = attendances.filter(status='A').count()
+    total_present = attendances.filter(status='Present').count()
+    total_absent = attendances.filter(status='Absent').count()
     attendance_percentage = round((total_present / total_conducted) * 100,0 ) if total_conducted > 0 else 0
 
     context = {
@@ -168,44 +168,134 @@ def confirm_delete(request, pk):
 
 
 
+# def class_detail(request, class_id):
+#     student_class = get_object_or_404(Class, id=class_id)
+#     students = Student.objects.filter(student_class=student_class)
+    
+#     if request.method == 'POST':
+#         forms = [
+#             (student, AttendanceForm(request.POST, prefix=str(student.id), initial={'student': student, 'date': date.today()}))
+#             for student in students
+#         ]
+        
+#         all_valid = True
+#         for student, form in forms:
+#             if form.is_valid():
+#                 pass
+#             else:
+#                 all_valid = False
+        
+#         if all_valid:
+#             for student, form in forms:
+#                 attendance = form.save(commit=False)
+#                 attendance.date = date.today()
+#                 attendance.save()
+#             messages.success(request, "Attendance submitted successfully!")
+#             return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
+    
+#     else:
+#         forms = [
+#             (student, AttendanceForm(prefix=str(student.id), initial={'student': student, 'date': date.today()}))
+#             for student in students
+#         ]
+    
+#     return render(request, 'students/class_detail.html', {
+#         'student_class': student_class,
+#         'students': forms  
+#     })
+
+# views.py
+# views.py
+# from django.shortcuts import render, get_object_or_404
+# from django.http import HttpResponseRedirect
+# from django.urls import reverse
+# from django.contrib import messages
+# from .models import Class, Student, Attendance, Period
+# from .forms import AttendanceForm
+
+# def class_detail(request, class_id):
+#     student_class = get_object_or_404(Class, pk=class_id)
+#     students = Student.objects.filter(student_class=student_class)
+#     periods = Period.objects.all()
+
+#     if request.method == 'POST':
+#         for student in students:
+#             date = request.POST.get('date')
+#             period_id = request.POST.get('period')
+#             status = request.POST.get(f'status_{student.id}')
+            
+#             # Debugging output
+#             print(f"Student ID: {student.id}, Date: {date}, Period ID: {period_id}, Status: {status}")
+            
+#             if not status:
+#                 messages.error(request, f'Status for student {student.name} is missing.')
+#                 return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
+
+#             period = Period.objects.get(id=period_id)
+#             attendance, created = Attendance.objects.get_or_create(
+#                 student=student, date=date, period=period,
+#                 defaults={'status': status}
+#             )
+#             if not created:
+#                 attendance.status = status
+#                 attendance.save()
+#         messages.success(request, 'Attendance submitted successfully.')
+#         return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
+
+#     forms = [(student, AttendanceForm(initial={'student': student, 'date': '2024-07-01', 'period': periods[0]})) for student in students]
+
+#     return render(request, 'students/class_detail.html', {
+#         'student_class': student_class,
+#         'students': forms,
+#         'periods': periods,
+#     })
+# views.py
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib import messages
+from .models import Student, Attendance, Period, Class
+from .forms import AttendanceForm
+
 def class_detail(request, class_id):
-    student_class = get_object_or_404(Class, id=class_id)
+    student_class = get_object_or_404(Class, pk=class_id)
     students = Student.objects.filter(student_class=student_class)
-    
+    periods = Period.objects.all()
+
     if request.method == 'POST':
-        forms = [
-            (student, AttendanceForm(request.POST, prefix=str(student.id), initial={'student': student, 'date': date.today()}))
-            for student in students
-        ]
-        
-        all_valid = True
-        for student, form in forms:
-            if form.is_valid():
-                pass
-            else:
-                all_valid = False
-        
-        if all_valid:
-            for student, form in forms:
-                attendance = form.save(commit=False)
-                attendance.date = date.today()
+        date = request.POST.get('date')
+        period_id = request.POST.get('period')
+        period = get_object_or_404(Period, id=period_id)
+
+        for student in students:
+            status = request.POST.get(f'status_{student.id}')
+            attendance, created = Attendance.objects.get_or_create(
+                student=student, date=date, period=period,
+                defaults={'status': status}
+            )
+            if not created:
+                attendance.status = status
                 attendance.save()
-            messages.success(request, "Attendance submitted successfully!")
-            return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
-    
-    else:
-        forms = [
-            (student, AttendanceForm(prefix=str(student.id), initial={'student': student, 'date': date.today()}))
-            for student in students
-        ]
-    
+
+        messages.success(request, 'Attendance submitted successfully.')
+        return redirect('class_detail', class_id=class_id)
+
+    forms = [(student, AttendanceForm(initial={'student': student, 'date': '2024-07-01', 'period': periods[0]})) for student in students]
+
     return render(request, 'students/class_detail.html', {
         'student_class': student_class,
-        'students': forms  
+        'students': forms,
+        'periods': periods,
     })
 
 
+from .models import Period
 
+def create_periods():
+    periods = [
+        {'name': 'Morning', 'start_time': '08:00:00', 'end_time': '12:00:00'},
+        {'name': 'Afternoon', 'start_time': '12:00:00', 'end_time': '16:00:00'},
+    ]
+    for period in periods:
+        Period.objects.get_or_create(**period)
 
 
 
@@ -232,8 +322,8 @@ def class_attendance(request, class_id):
     for student in students:
         attendances = Attendance.objects.filter(student=student)
         total_conducted = attendances.count()
-        total_present = attendances.filter(status='P').count()
-        total_absent = attendances.filter(status='A').count()
+        total_present = attendances.filter(status='Present').count()
+        total_absent = attendances.filter(status='Absent').count()
         attendance_percentage = (total_present / total_conducted) * 100 if total_conducted > 0 else 0
         
         attendance_data.append({
@@ -461,11 +551,49 @@ def class_marks_view(request, class_id):
         'students': students,
         'marks': marks  # Pass marks to the template
     })
+# from django.shortcuts import render, get_object_or_404, redirect
+# from django.contrib import messages
+# from .models import Student, Attendance
+# from .forms import AttendanceForm
+# from datetime import date
+
+# def attendance_update(request, student_id):
+#     student = get_object_or_404(Student, id=student_id)
+#     if request.method == 'POST':
+#         form = UpdateAttendanceForm(request.POST)
+#         if form.is_valid():
+#             status = form.cleaned_data['status']
+#             date = form.cleaned_data['date']
+            
+#             # Check if attendance for this student on this date already exists
+#             try:
+#                 attendance = Attendance.objects.get(student=student, date=date)
+                
+#                 # Update existing attendance record
+#                 attendance.status = status
+#                 attendance.save()
+                
+#                 messages.success(request, 'Attendance updated successfully.')
+#             except Attendance.DoesNotExist:
+#                 # Create new attendance record if none exists for this date
+#                 attendance = Attendance(student=student, date=date, status=status)
+#                 attendance.save()
+                
+#                 messages.success(request, 'Attendance recorded successfully.')
+            
+#             return redirect('class_student_list', class_id=student.student_class.id)
+#     else:
+#         # Handle GET request or form initialization
+#         form = UpdateAttendanceForm()
+    
+#     # Render the template with the form
+#     return render(request, 'students/attendance_update.html', {'form': form, 'student': student})
+
+# views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .models import Student, Attendance
-from .forms import AttendanceForm
-from datetime import date
+from .models import Student, Attendance, Period
+from .forms import UpdateAttendanceForm
 
 def attendance_update(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -474,10 +602,11 @@ def attendance_update(request, student_id):
         if form.is_valid():
             status = form.cleaned_data['status']
             date = form.cleaned_data['date']
+            period = form.cleaned_data['period']
             
-            # Check if attendance for this student on this date already exists
+            # Check if attendance for this student on this date and period already exists
             try:
-                attendance = Attendance.objects.get(student=student, date=date)
+                attendance = Attendance.objects.get(student=student, date=date, period=period)
                 
                 # Update existing attendance record
                 attendance.status = status
@@ -485,8 +614,8 @@ def attendance_update(request, student_id):
                 
                 messages.success(request, 'Attendance updated successfully.')
             except Attendance.DoesNotExist:
-                # Create new attendance record if none exists for this date
-                attendance = Attendance(student=student, date=date, status=status)
+                # Create new attendance record if none exists for this date and period
+                attendance = Attendance(student=student, date=date, period=period, status=status)
                 attendance.save()
                 
                 messages.success(request, 'Attendance recorded successfully.')

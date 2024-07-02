@@ -61,17 +61,16 @@
         
         <form method="post">
             {% csrf_token %}
-            <div class="mb-3">
-                <label for="id_status" class="form-label">Status</label>
-                {{ form.status }}
+            <div class="form-group">
+                {{ form.date.label_tag }} {{ form.date }}
             </div>
-            <div class="mb-3">
-                <label for="id_date" class="form-label">Date</label>
-                {{ form.date }}
+            <div class="form-group">
+                {{ form.period.label_tag }} {{ form.period }}
             </div>
-            <div class="text-center">
-                <button type="submit" class="btn btn-custom">Update Attendance</button>
+            <div class="form-group">
+                {{ form.status.label_tag }} {{ form.status }}
             </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
         </form>
         
        
