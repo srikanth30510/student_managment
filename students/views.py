@@ -60,9 +60,27 @@ def logout_view(request):
     logout(request)
     return redirect('home')
 
+# def student_list(request):
+
+#     students = Student.objects.all()
+#     return render(request, 'students/student_list.html', {'students': students})
+from django.shortcuts import render
+from .models import Student, Class
+
 def student_list(request):
-    students = Student.objects.all()
-    return render(request, 'students/student_list.html', {'students': students})
+    classes = Class.objects.all()  # Fetch all classes for filter options
+
+    if request.method == 'POST':
+        class_id = request.POST.get('class_id')  # Get selected class ID from form
+        if class_id == 'all':
+            students = Student.objects.all()
+        else:
+            students = Student.objects.filter(student_class_id=class_id)
+    else:
+        students = Student.objects.all()
+
+    return render(request, 'students/student_list.html', {'students': students, 'classes': classes})
+
 
 def timetable_view(request, student_id):
     student = get_object_or_404(Student, id=student_id)
