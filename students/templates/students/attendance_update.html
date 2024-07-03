@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Attendance for {{ student.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Include jQuery and Bootstrap Datepicker -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .container {
+            margin-top: 50px;
+        }
+        .btn-custom {
+            margin-top: 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+        }
+        .btn-custom:hover {
+            background-color: #0056b3;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+    </style>
+    
+    <script>
+        // Initialize datepicker when document is ready
+        $(document).ready(function() {
+            $('#id_date').datepicker({
+                format: 'yyyy-mm-dd',  // Set desired date format
+                autoclose: true,       // Close the datepicker immediately upon selection
+                todayHighlight: true   // Highlight today's date
+            });
+        });
+    </script>
+</head>
+<body>
+    {% include 'students/navbar.html' %}
+
+    {% if messages %}
+    <div class="mt-4">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}" role="alert">
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="container">
+        <h1 class="text-center">Update Attendance for {{ student.name }}</h1>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                {{ form.date.label_tag }} {{ form.date }}
+            </div>
+            <div class="form-group">
+                {{ form.period.label_tag }} {{ form.period }}
+            </div>
+            <div class="form-group">
+                {{ form.status.label_tag }} {{ form.status }}
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        
+       
+    </div>
+</body>
+</html>

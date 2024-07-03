@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Attendance for {{ student_class.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa; /* Bootstrap default background color */
+            padding-top: 0px; /* Adjusted top padding for navbar */
+        }
+        .container {
+            max-width: 800px; /* Limit container width for better readability */
+        }
+        h1 {
+            margin-bottom: 2rem;
+            color: #343a40; /* Bootstrap dark color */
+        }
+        table {
+            background-color: #ffffff; /* White background for table */
+            border-radius: 8px; /* Rounded corners for table */
+        }
+        th, td {
+            vertical-align: middle; /* Center content vertically */
+        }
+        th {
+            background-color: #6c757d; /* Bootstrap table header color */
+            color: #ffffff; /* White text for table headers */
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0,0,0,.05); /* Light striped background for odd rows */
+        }
+        .table-striped tbody tr:hover {
+            background-color: rgba(0,0,0,.075); /* Darker background on hover */
+        }
+    </style>
+</head>
+<body>
+    
+    {% include 'students/navbar.html' %}
+
+    <div class="container mt-5">
+        <h1>Class Attendance for {{ student_class.name }}</h1>
+
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Student</th>
+                        <th>Total Conducted</th>
+                        <th>Total Present</th>
+                        <th>Total Absent</th>
+                        <th>Attendance Percentage</th>
+                        <th>View</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for data in attendance_data %}
+                    <tr>
+                        <td>{{ data.student.name }}</td>
+                        <td>{{ data.total_conducted }}</td>
+                        <td>{{ data.total_present }}</td>
+                        <td>{{ data.total_absent }}</td>
+                        <td>{{ data.attendance_percentage }}%</td>
+                        <td><a href="{% url 'attendance_view' data.student.id %}">View</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
