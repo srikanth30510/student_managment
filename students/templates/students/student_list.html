@@ -124,7 +124,6 @@
                 </select>
                 <button type="submit" class="btn btn-primary">Search</button>
         </form>
-
         {% if students %}
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -132,7 +131,6 @@
                         <tr>
                             <th>Roll Number</th>
                             <th>Name</th>
-                           
                             <th>Class</th>
                             <th>Update</th>
                             <th>Delete</th>
@@ -145,7 +143,6 @@
                         <tr>
                             <td>{{ student.roll_number }}</td>
                             <td>{{ student.name }}</td>
-                            
                             <td>{{ student.student_class }}</td>
                             <td><a class="btn btn-sm btn-info" href="{% url 'edit_student' student.pk %}">Update</a></td>
                             <td><a class="btn btn-sm btn-danger" href="{% url 'confirm_delete' student.pk %}">Delete</a></td>
