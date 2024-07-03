@@ -18,15 +18,17 @@
         }
         .card {
             margin-top: 20px;
-            border: none;
+            border: 1px dashed black;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            
         }
         .btn-block {
             display: block;
-            width: 100%;
+            width: 50%;
         }
         .card-body {
             padding: 1.25rem;
+
         }
         .card-body table {
             margin-bottom: 0;
@@ -63,7 +65,8 @@
             font-size: 0.875rem;
         }
         .btn-sm.btn-block {
-            width: auto;
+            width: 20%;
+            float: right;
         }
         .btn-sm.btn-block + .btn-sm.btn-block {
             margin-top: 0.5rem;
@@ -74,12 +77,35 @@
         .mt-5 {
             margin-top: 3rem;
         }
+        .container-wrapper {
+            display: flex;    
+        }
+        .container2{
+            max-width:900px;
+            border: 2px solid green;
+            margin-top: 10px;
+            background-color: #dfffff;
+            margin-left:0;
+           width:1100px;
+           margin-right: 50px;
+           padding:5px;
+        }
+        .container1 {
+            border:1px solid black;
+            max-width: 500px;
+            margin-top: 75px;
+            margin-left: 50px;
+            overflow:hidden;
+            padding: 5px;
+            
+        }   
     </style>
 </head>
 <body>
     {% include 'students/navbar.html' %}
-    
+    <div class="container-wrapper">
     <div class="container mt-4">
+        <div class="container1">
         <h1 class="text-center">Student List</h1>
         {% if students %}
             <div class="table-responsive">
@@ -112,8 +138,10 @@
             <p class="text-center mt-3">No students available.</p>
         {% endif %}
     </div>
+    </div>
 
     <div class="container mt-5">
+        <div class="container2">
         <div class="row">
             <div class="col-md-12">
                 <h5 class="text-center">Actions</h5>
@@ -124,23 +152,23 @@
                         <table class="table">
                             <thead>
                                 <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
                                     <th>Update</th>
                                     <th>Delete</th>
                                     <th>View Attendance</th>
                                     <th>View Marks</th>
-                                    <th>ID</th>
-                                    <th>Name</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for student in students %}
                                 <tr>
+                                    <td>{{ student.id }}</td>
+                                    <td>{{ student.name }}</td>
                                     <td><a class="btn btn-sm btn-info" href="{% url 'edit_student' student.pk %}">Update</a></td>
                                     <td><a class="btn btn-sm btn-danger" href="{% url 'confirm_delete' student.pk %}">Delete</a></td>
                                     <td><a class="btn btn-sm btn-info" href="{% url 'attendance_view' student.id %}">View Attendance</a></td>
                                     <td><a class="btn btn-sm btn-info" href="{% url 'marks_view' student.id %}">View Marks</a></td>
-                                    <td>{{ student.id }}</td>
-                                    <td>{{ student.name }}</td>
                                 </tr>
                                 {% empty %}
                                 <tr>
@@ -154,5 +182,7 @@
             </div>
         </div>
     </div>
+    </div>
+</div>
 </body>
 </html>

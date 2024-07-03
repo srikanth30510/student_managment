@@ -252,19 +252,29 @@ def confirm_delete(request, pk):
 # views.py
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.utils import timezone
 from .models import Student, Attendance, Period, Class
 from .forms import AttendanceForm
 
 def class_detail(request, class_id):
     student_class = get_object_or_404(Class, pk=class_id)
     students = Student.objects.filter(student_class=student_class)
-    periods = Period.objects.all()
-
+    
+    today = timezone.now().date()
+    selected_date = request.GET.get('date', today)
+    periods = Period.objects.filter(date=selected_date)
+    
     if request.method == 'POST':
         date = request.POST.get('date')
         period_id = request.POST.get('period')
         period = get_object_or_404(Period, id=period_id)
-
+        
+        # Check if attendance for this period already exists on the selected date
+        existing_attendance = Attendance.objects.filter(period=period, date=date).exists()
+        if existing_attendance:
+            messages.success(request, f'ఇందాకే  "{period.name}" on {date} తీసుకున్నావు raa')
+            return redirect('class_detail', class_id=class_id)
+        
         for student in students:
             status = request.POST.get(f'status_{student.id}')
             attendance, created = Attendance.objects.get_or_create(
@@ -278,13 +288,22 @@ def class_detail(request, class_id):
         messages.success(request, 'Attendance submitted successfully.')
         return redirect('class_detail', class_id=class_id)
 
-    forms = [(student, AttendanceForm(initial={'student': student, 'date': '2024-07-01', 'period': periods[0]})) for student in students]
+    forms = [(student, AttendanceForm(initial={'student': student, 'date': selected_date, 'period': periods[0] if periods else None})) for student in students]
 
     return render(request, 'students/class_detail.html', {
         'student_class': student_class,
         'students': forms,
         'periods': periods,
+        'selected_date': selected_date,
     })
+
+
+def get_periods(request):
+    date = request.GET.get('date')
+    periods = Period.objects.filter(date=date)
+    periods_data = [{'id': period.id, 'name': period.name, 'start_time': period.start_time, 'end_time': period.end_time} for period in periods]
+    return JsonResponse({'periods': periods_data})
+
 
 
 from .models import Period

@@ -40,6 +40,7 @@ class Period(models.Model):
     name = models.CharField(max_length=50)  # e.g., 'Morning', 'Afternoon', etc.
     start_time = models.TimeField()
     end_time = models.TimeField()
+    date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return self.name

@@ -214,11 +214,32 @@
         .alert {
             margin-top: 20px;
         }
-        .table-responsive{
+        .table-responsive {
             margin-top: 10px;
         }
-        
     </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function loadPeriods() {
+            const date = document.getElementById('date').value;
+            $.ajax({
+                url: '{% url "get_periods" %}',
+                data: {
+                    'date': date
+                },
+                success: function(data) {
+                    const periodSelect = document.getElementById('period');
+                    periodSelect.innerHTML = '';
+                    data.periods.forEach(period => {
+                        const option = document.createElement('option');
+                        option.value = period.id;
+                        option.textContent = `${period.name} (${period.start_time} - ${period.end_time})`;
+                        periodSelect.appendChild(option);
+                    });
+                }
+            });
+        }
+    </script>
 </head>
 <body>
     {% include 'students/navbar.html' %}
@@ -246,7 +267,7 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="date">Select Date:</label>
-                            <input type="date" name="date" id="date" class="form-control" required>
+                            <input type="date" name="date" id="date" class="form-control" value="{{ selected_date }}" required onchange="loadPeriods()">
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -304,4 +325,5 @@
     </div>
 </body>
 </html>
+
 
