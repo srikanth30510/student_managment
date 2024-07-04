@@ -40,7 +40,14 @@ AttendanceFormSet = modelformset_factory(Attendance, fields=('student', 'status'
 class MarkForm(forms.ModelForm):
     class Meta:
         model = Mark
-        fields = [ 'subject', 'mark'] 
+        fields = ['test', 'subject', 'mark']
+        widgets = {
+            'test': forms.Select(attrs={'class': 'form-select'}),  # Example of adding a class to the form field
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['test'].required = True 
     
 # class UpdateAttendanceForm(forms.ModelForm):
 #     class Meta:
