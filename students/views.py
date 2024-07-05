@@ -48,7 +48,6 @@ def login_view(request):
                 return redirect('home')
     else:
         form = AuthenticationForm()
-
     return render(request, 'students/login.html', {'form': form})
 
 def logout_view(request):
