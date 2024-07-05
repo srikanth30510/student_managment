@@ -37,10 +37,32 @@ from django.forms import modelformset_factory
 
 AttendanceFormSet = modelformset_factory(Attendance, fields=('student', 'status'), extra=0)
 
+# class MarkForm(forms.ModelForm):
+#     class Meta:
+#         model = Mark
+#         fields = ['test', 'subject', 'mark']
+#         widgets = {
+#             'test': forms.Select(attrs={'class': 'form-select'}),  # Example of adding a class to the form field
+#         }
+
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         self.fields['test'].required = True 
+from django import forms
+from .models import Mark
+
 class MarkForm(forms.ModelForm):
     class Meta:
         model = Mark
-        fields = [ 'subject', 'mark'] 
+        fields = ['test', 'subject', 'mark']
+        widgets = {
+            'test': forms.Select(attrs={'class': 'form-select'}),  # Example of adding a class to the form field
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['test'].required = True 
+
     
 # class UpdateAttendanceForm(forms.ModelForm):
 #     class Meta:

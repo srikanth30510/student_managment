@@ -23,6 +23,7 @@ class Student(models.Model):
     
 class Mark(models.Model):
     student = models.ForeignKey(Student, on_delete=models.CASCADE)
+    test=models.CharField(max_length=10, choices=[('Test1', 'Test1'), ('Test2', 'Test2'),('Test3', 'Test3'),('Test4', 'Test4')])
     subject = models.CharField(max_length=50)
     mark = models.IntegerField()
     def __str__(self):
@@ -81,3 +82,6 @@ class Timetable(models.Model):
 
     def __str__(self):
         return f"{self.day} - {self.time} - {self.subject} - {self.teacher}"
+    
+
+

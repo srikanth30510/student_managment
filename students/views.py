@@ -260,7 +260,7 @@ def add_student_to_class(request, class_id):
         form = StudentForm()
     return render(request, 'students/add_student_to_class.html', {'form': form, 'student_class': student_class})
 
-def class_marks(request, class_id):
+''' def class_marks(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
     students = Student.objects.filter(student_class=student_class)
     
@@ -294,7 +294,7 @@ def class_marks(request, class_id):
     return render(request, 'students/class_marks.html', {
         'student_class': student_class,
         'students': forms
-    })
+    }) '''
 
 def class_student_list(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
@@ -303,7 +303,7 @@ def class_student_list(request, class_id):
     return render(request, 'students/class_student_list.html', {
         'student_class': student_class,
         'students': students
-    })
+    }) 
 
 def confirm_delete_class(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
@@ -408,4 +408,87 @@ def delete_mark_by_name(request):
     return HttpResponseBadRequest("Invalid request method.")
 
 
+
+# from django.shortcuts import render, get_object_or_404, redirect
+# from django.http import HttpResponseRedirect
+# from django.urls import reverse
+# from django.contrib import messages
+# from .models import Class, Student, Mark
+# from .forms import MarkForm
+
+# def class_marks(request, class_id):
+#     student_class = get_object_or_404(Class, id=class_id)
+#     students = Student.objects.filter(student_class=student_class)
+    
+#     if request.method == 'POST':
+#         forms = [
+#             (student, MarkForm(request.POST, prefix=str(student.id), instance=Mark(student=student)))
+#             for student in students
+#         ]
+        
+#         all_valid = True
+#         for student, form in forms:
+#             if form.is_valid():
+#                 form.save()
+#             else:
+#                 all_valid = False
+#                 print(form.errors)
+        
+#         if all_valid:
+#             messages.success(request, "Marks submitted successfully!")
+#             return HttpResponseRedirect(reverse('class_marks', args=[class_id]))
+    
+#     else:
+#         forms = [
+#             (student, MarkForm(prefix=str(student.id), instance=Mark(student=student)))
+#             for student in students
+#         ]
+    
+#     return render(request, 'students/class_marks.html', {
+#         'student_class': student_class,
+#         'students': forms
+#     })
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib import messages
+from .models import Class, Student, Mark
+from .forms import MarkForm
+
+def class_marks(request, class_id):
+    student_class = get_object_or_404(Class, id=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    
+    if request.method == 'POST':
+        test_name = request.POST.get('test_name')
+        all_valid = True
+
+        forms = []  # Initialize the forms list
+
+        for student in students:
+            form_data = request.POST.copy()
+            form_data[f'{student.id}-test'] = test_name  # Ensure the test name is set in the form data with prefix
+            form = MarkForm(form_data, prefix=str(student.id), instance=Mark(student=student))
+            forms.append((student, form))  # Append the form to the forms list
+            if form.is_valid():
+                form.save()
+            else:
+                all_valid = False
+                print(form.errors)
+        
+        if all_valid:
+            messages.success(request, "Marks submitted successfully!")
+            return HttpResponseRedirect(reverse('class_marks', args=[class_id]))
+    
+    else:
+        forms = [
+            (student, MarkForm(prefix=str(student.id), instance=Mark(student=student)))
+            for student in students
+        ]
+    
+    return render(request, 'students/class_marks.html', {
+        'student_class': student_class,
+        'students': forms
+    })
 

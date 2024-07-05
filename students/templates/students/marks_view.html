@@ -44,6 +44,7 @@
         <table class="table table-bordered">
             <thead class="table-light">
                 <tr>
+                    <th>Test Name</th>
                     <th scope="col">Subject</th>
                     <th scope="col">Mark</th>
                     
@@ -52,6 +53,7 @@
             <tbody>
                 {% for mark in marks %}
                 <tr>
+                    <td>{{ mark.test }}</td>
                     <td>{{ mark.subject }}</td>
                     <td>{{ mark.mark }}</td>
 
