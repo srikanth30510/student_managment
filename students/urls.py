@@ -49,7 +49,9 @@ path('students/attendance_update/<int:student_id>/', views.attendance_update, na
     path('delete_mark_by_name/', views.delete_mark_by_name, name='delete_mark_by_name'),
 
 
-
+    path('add_period/',views.add_period,name='add_period'),
+    path('add_timetable/',views.add_timetable, name='add_timetable'),
+    path('view_timetable/<int:class_id>/', views.view_timetable, name='view_timetable'),
     
     
 ]

@@ -1,6 +1,6 @@
 from django.http import HttpResponseRedirect, JsonResponse,HttpResponseBadRequest
 from django.shortcuts import redirect, render, get_object_or_404
-from .forms import ClassForm, StudentForm, AttendanceForm,SignUpForm, UpdateAttendanceForm,MarkForm
+from .forms import ClassForm, PeriodForm, StudentForm, AttendanceForm,SignUpForm, TimetableForm, UpdateAttendanceForm,MarkForm
 from .models import Student, Timetable, Mark, Attendance, Class,Period
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
@@ -74,10 +74,33 @@ def timetable_view(request, student_id):
     timetables = Timetable.objects.filter(student=student)
     return render(request, 'students/timetable_view.html', {'timetables': timetables, 'student': student})
 
+'''def marks_view(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    marks = Mark.objects.filter(student=student)
+    return render(request, 'students/marks_view.html', {'marks': marks, 'student': student})'''
+
+from django.shortcuts import render, get_object_or_404
+from .models import Student, Mark
+
 def marks_view(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     marks = Mark.objects.filter(student=student)
-    return render(request, 'students/marks_view.html', {'marks': marks, 'student': student})
+    
+    # Organize marks by test names
+    marks_by_test = {}
+    for mark in marks:
+        test_name = mark.test
+        if test_name not in marks_by_test:
+            marks_by_test[test_name] = []
+        marks_by_test[test_name].append(mark)
+    
+    
+    return render(request, 'students/marks_view.html', {
+        
+        'marks_by_test': marks_by_test,
+        'mark':mark  
+    })
+
 
 def attendance_view(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -329,7 +352,7 @@ def edit_student_attendance(request, student_id, date):
 
     return render(request, 'students/edit_student_attendance.html', {'student': student, 'form': form, 'date': attendance_date})
 
-def class_marks_view(request, class_id):
+'''def class_marks_view(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
     students = Student.objects.filter(student_class=student_class)
     
@@ -340,7 +363,33 @@ def class_marks_view(request, class_id):
         'student_class': student_class,
         'students': students,
         'marks': marks  # Pass marks to the template
+    })'''
+
+from django.shortcuts import render, get_object_or_404
+from .models import Class, Student, Mark
+
+def class_marks_view(request, class_id):
+    student_class = get_object_or_404(Class, id=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    
+    # Fetch marks for all students in the class
+    marks = Mark.objects.filter(student__in=students)
+    
+    # Organize marks by test names
+    marks_by_test = {}
+    for mark in marks:
+        test_name = mark.test
+        if test_name not in marks_by_test:
+            marks_by_test[test_name] = []
+        marks_by_test[test_name].append(mark)
+    
+    return render(request, 'students/class_marks_view.html', {
+        'student_class': student_class,
+        'students': students,
+        'marks_by_test': marks_by_test,
+        'marks':mark  # Pass marks organized by test to the template
     })
+
 
 def attendance_update(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -492,3 +541,29 @@ def class_marks(request, class_id):
         'students': forms
     })
 
+def add_period(request):
+    if request.method == 'POST':
+        form=PeriodForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('class_list'))    
+    else:
+        form=PeriodForm()
+    return render(request,'students/add_period.html',{'form':form})
+
+
+
+def add_timetable(request):
+    if request.method == 'POST':
+        form = TimetableForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('class_list'))  
+    else:
+        form = TimetableForm()
+    return render(request, 'students/add_timetable.html', {'form': form})
+
+def view_timetable(request, class_id):
+    student_class = Class.objects.get(id=class_id)
+    timetables = student_class.timetables.all()
+    return render(request, 'students/view_timetable.html', {'student_class': student_class, 'timetables': timetables})

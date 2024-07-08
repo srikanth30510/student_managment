@@ -1,5 +1,5 @@
 from django import forms
-from .models import Attendance,Student,Class,Mark, Timetable
+from .models import Attendance,Student,Class,Mark, Timetable,Period
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 
@@ -98,3 +98,13 @@ class AttendanceForm(forms.ModelForm):
             'date': forms.HiddenInput(),
             'period': forms.HiddenInput(),
         }
+
+class PeriodForm(forms.ModelForm):
+    class Meta:
+        model=Period
+        fields=['name','start_time','end_time','date']
+
+class TimetableForm(forms.ModelForm):
+    class Meta:
+        model = Timetable
+        fields = ['day', 'time', 'subject', 'teacher', 'student_class']
