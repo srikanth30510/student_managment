@@ -7,21 +7,30 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            background:url('https://img.freepik.com/free-vector/circles-background-dark-tones_60389-166.jpg?size=626&ext=jpg&ga=GA1.1.1413502914.1719792000&semt=ais_user') no-repeat center center fixed;
+            background:url('https://img.freepik.com/free-vector/beautiful-decorative-soft-colorful-watercolor-texture-background_1055-14290.jpg') no-repeat center center fixed;
             background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        }
+        nav{
+            font-size: 20px;
+            margin-top:5px;
+            background-color: rgb(255, 255, 255);
+            padding:5px;
+            margin-left:5px;
+            margin-right:5px;
+            border:1px solid black;
+
         }
         .register-container {
-            background-color:#e8dcdc;
+            background-color:transparent;
             padding: 40px;
-            border-radius: 10px;
+            border-radius: 2rem;
+            border: 2px solid black;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             max-width: 500px;
-            width: 100%;
+            width:30%;
+            height:40%;
+            margin-top:5%;
+            margin-left: 35%;
         }
         [for="id_username"],[for="id_email"],[for="id_password1"]{
             margin-left:15%;
@@ -96,6 +105,26 @@
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <a style="margin-left: 10px;" class="navbar-brand text-dark" href="{% url 'home' %}">WELCOME TO STUDENT MANAGMENT SYSTEM(SMS)</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+            </ul>
+            <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" href="{% url 'login' %}">Login</a>
+                    </li>
+                    <li>
+                        <a></a>
+                    </li>
+                    
+                    
+            </ul>
+        </div>
+    </nav>
     <div class="register-container">
         <h2>Register</h2>
         {% if form.errors %}

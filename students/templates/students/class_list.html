@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Class List</title>
-    <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         body {
@@ -77,7 +75,7 @@
                         <a href="{% url 'class_marks' student_class.id %}" class="btn btn-sm btn-outline-success">Add Marks</a>
 
                         <a href="{% url 'class_marks_view' student_class.id %}" class="btn btn-sm btn-outline-warning">View Marks</a>
-
+                        <a href="{% url 'view_timetable' student_class.id %}" class="btn btn-sm btn-outline-info">View Timetable</a>
 
 
 

@@ -12,9 +12,7 @@ urlpatterns = [
     path('timetable/<int:student_id>/', views.timetable_view, name='timetable_view'),
     path('classes/', views.class_list, name='class_list'),
     path('classes/<int:class_id>/', views.class_detail, name='class_detail'),
-
- path('get_periods/', views.get_periods, name='get_periods'),
-
+    path('get_periods/', views.get_periods, name='get_periods'),
     path('students/<int:student_id>/', views.student_detail, name='student_detail'),
     path('submit_attendance/', views.submit_attendance, name='submit_attendance'),
     path('classes/add/', views.add_class, name='add_class'),
@@ -51,7 +49,9 @@ path('students/attendance_update/<int:student_id>/', views.attendance_update, na
     path('delete_mark_by_name/', views.delete_mark_by_name, name='delete_mark_by_name'),
 
 
-
+    path('add_period/',views.add_period,name='add_period'),
+    path('add_timetable/',views.add_timetable, name='add_timetable'),
+    path('view_timetable/<int:class_id>/', views.view_timetable, name='view_timetable'),
     
     
 ]

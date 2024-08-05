@@ -1,14 +1,19 @@
-from django.urls import reverse
-from datetime import date
-import json
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse,HttpResponseBadRequest
 from django.shortcuts import redirect, render, get_object_or_404
-from .forms import ClassForm, StudentForm, AttendanceForm,SignUpForm, UpdateAttendanceForm
-from .models import Student, Timetable, Mark, Attendance, Class
+from .forms import ClassForm, PeriodForm, StudentForm, AttendanceForm,SignUpForm, TimetableForm, UpdateAttendanceForm,MarkForm
+from .models import Student, Timetable, Mark, Attendance, Class,Period
 from django.contrib import messages
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import logout
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login
+from django.utils import timezone
+from django.forms import modelformset_factory
+from django.core.exceptions import MultipleObjectsReturned
+from django.urls import reverse
+from datetime import date, datetime
+import json
 
 def navbar(request):
     return render(request, 'students/navbar.html')
@@ -16,10 +21,6 @@ def navbar(request):
 def home(request):
     students = Student.objects.all()
     return render(request, 'students/home.html', {'students': students})
-
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
-from .forms import SignUpForm
 
 def register(request):
     if request.method == 'POST':
@@ -33,13 +34,7 @@ def register(request):
             return redirect('login')
     else:
         form = SignUpForm()
-    
     return render(request, 'students/register.html', {'form': form})
-
-    
-from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.forms import AuthenticationForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -53,25 +48,17 @@ def login_view(request):
                 return redirect('home')
     else:
         form = AuthenticationForm()
-
     return render(request, 'students/login.html', {'form': form})
 
 def logout_view(request):
     logout(request)
     return redirect('home')
 
-# def student_list(request):
-
-#     students = Student.objects.all()
-#     return render(request, 'students/student_list.html', {'students': students})
-from django.shortcuts import render
-from .models import Student, Class
-
 def student_list(request):
-    classes = Class.objects.all()  # Fetch all classes for filter options
+    classes = Class.objects.all()  
 
     if request.method == 'POST':
-        class_id = request.POST.get('class_id')  # Get selected class ID from form
+        class_id = request.POST.get('class_id')  
         if class_id == 'all':
             students = Student.objects.all()
         else:
@@ -87,12 +74,33 @@ def timetable_view(request, student_id):
     timetables = Timetable.objects.filter(student=student)
     return render(request, 'students/timetable_view.html', {'timetables': timetables, 'student': student})
 
+'''def marks_view(request, student_id):
+    student = get_object_or_404(Student, id=student_id)
+    marks = Mark.objects.filter(student=student)
+    return render(request, 'students/marks_view.html', {'marks': marks, 'student': student})'''
+
+from django.shortcuts import render, get_object_or_404
+from .models import Student, Mark
+
 def marks_view(request, student_id):
     student = get_object_or_404(Student, id=student_id)
     marks = Mark.objects.filter(student=student)
-    return render(request, 'students/marks_view.html', {'marks': marks, 'student': student})
-from django.shortcuts import render, get_object_or_404
-from .models import Student, Attendance
+    
+    # Organize marks by test names
+    marks_by_test = {}
+    for mark in marks:
+        test_name = mark.test
+        if test_name not in marks_by_test:
+            marks_by_test[test_name] = []
+        marks_by_test[test_name].append(mark)
+    
+    
+    return render(request, 'students/marks_view.html', {
+        
+        'marks_by_test': marks_by_test,
+        'mark':mark  
+    })
+
 
 def attendance_view(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -140,28 +148,6 @@ def add_student(request):
         form = StudentForm()
     return render(request, 'students/add_student.html', {'form': form})
 
-# def edit_student(request,pk):
-#     student=get_object_or_404(Student,pk=pk)
-#     if request.method == 'POST':
-#         form = StudentForm(request.POST,instance=student)
-#         if form.is_valid():
-#             form.save()
-#             return redirect('student_list')
-#     else:
-#         form = StudentForm(instance=student)
-#     return render(request, 'edit_student.html',{'form':form})
-
-# def confirm_delete(request,pk):
-#     student=get_object_or_404(Student,pk=pk)
-#     if request.method == 'POST':
-#         student.delete()
-#         return redirect('student_list')
-#     return render(request,'confirm_delete.html',{'student':student})
-
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Student
-from .forms import StudentForm
-
 def edit_student(request, pk):
     student = get_object_or_404(Student, pk=pk)
     
@@ -184,95 +170,6 @@ def confirm_delete(request, pk):
     
     return render(request, 'students/confirm_delete.html', {'student': student})
 
-
-
-# def class_detail(request, class_id):
-#     student_class = get_object_or_404(Class, id=class_id)
-#     students = Student.objects.filter(student_class=student_class)
-    
-#     if request.method == 'POST':
-#         forms = [
-#             (student, AttendanceForm(request.POST, prefix=str(student.id), initial={'student': student, 'date': date.today()}))
-#             for student in students
-#         ]
-        
-#         all_valid = True
-#         for student, form in forms:
-#             if form.is_valid():
-#                 pass
-#             else:
-#                 all_valid = False
-        
-#         if all_valid:
-#             for student, form in forms:
-#                 attendance = form.save(commit=False)
-#                 attendance.date = date.today()
-#                 attendance.save()
-#             messages.success(request, "Attendance submitted successfully!")
-#             return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
-    
-#     else:
-#         forms = [
-#             (student, AttendanceForm(prefix=str(student.id), initial={'student': student, 'date': date.today()}))
-#             for student in students
-#         ]
-    
-#     return render(request, 'students/class_detail.html', {
-#         'student_class': student_class,
-#         'students': forms  
-#     })
-
-# views.py
-# views.py
-# from django.shortcuts import render, get_object_or_404
-# from django.http import HttpResponseRedirect
-# from django.urls import reverse
-# from django.contrib import messages
-# from .models import Class, Student, Attendance, Period
-# from .forms import AttendanceForm
-
-# def class_detail(request, class_id):
-#     student_class = get_object_or_404(Class, pk=class_id)
-#     students = Student.objects.filter(student_class=student_class)
-#     periods = Period.objects.all()
-
-#     if request.method == 'POST':
-#         for student in students:
-#             date = request.POST.get('date')
-#             period_id = request.POST.get('period')
-#             status = request.POST.get(f'status_{student.id}')
-            
-#             # Debugging output
-#             print(f"Student ID: {student.id}, Date: {date}, Period ID: {period_id}, Status: {status}")
-            
-#             if not status:
-#                 messages.error(request, f'Status for student {student.name} is missing.')
-#                 return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
-
-#             period = Period.objects.get(id=period_id)
-#             attendance, created = Attendance.objects.get_or_create(
-#                 student=student, date=date, period=period,
-#                 defaults={'status': status}
-#             )
-#             if not created:
-#                 attendance.status = status
-#                 attendance.save()
-#         messages.success(request, 'Attendance submitted successfully.')
-#         return HttpResponseRedirect(reverse('class_detail', args=[class_id]))
-
-#     forms = [(student, AttendanceForm(initial={'student': student, 'date': '2024-07-01', 'period': periods[0]})) for student in students]
-
-#     return render(request, 'students/class_detail.html', {
-#         'student_class': student_class,
-#         'students': forms,
-#         'periods': periods,
-#     })
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from django.utils import timezone
-from .models import Student, Attendance, Period, Class
-from .forms import AttendanceForm
 
 def class_detail(request, class_id):
     student_class = get_object_or_404(Class, pk=class_id)
@@ -321,10 +218,6 @@ def get_periods(request):
     periods = Period.objects.filter(date=date)
     periods_data = [{'id': period.id, 'name': period.name, 'start_time': period.start_time, 'end_time': period.end_time} for period in periods]
     return JsonResponse({'periods': periods_data})
-
-
-
-from .models import Period
 
 def create_periods():
     periods = [
@@ -390,104 +283,7 @@ def add_student_to_class(request, class_id):
         form = StudentForm()
     return render(request, 'students/add_student_to_class.html', {'form': form, 'student_class': student_class})
 
-
-
-# views.py
-# views.py
-# views.py
-
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Class, Student, Mark
-from .forms import MarkForm
-from django.forms import modelformset_factory
-'''
-def class_marks(request, class_id):
-    student_class = get_object_or_404(Class, pk=class_id)
-    students = Student.objects.filter(student_class=student_class)
-
-    # Create a formset for Marks
-    MarkFormSet = modelformset_factory(Mark, form=MarkForm, extra=len(students), can_delete=True)
-
-    if request.method == 'POST':
-        formset = MarkFormSet(request.POST)
-        if formset.is_valid():
-            formset.save()
-            return redirect('students/marks_success.html')  # Redirect to a success page or similar
-    else:
-        initial_data = [{'student': student.id} for student in students]
-        formset = MarkFormSet(queryset=Mark.objects.none(), initial=initial_data)
-
-    return render(request, 'students/class_marks.html', {
-        'student_class': student_class,
-        'students': students,
-        'formset': formset,
-    })
-
-# views.py
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.forms import modelformset_factory
-from .models import Class, Student, Mark
-from .forms import MarkForm
-
-def class_marks(request, class_id):
-    student_class = get_object_or_404(Class, pk=class_id)
-    students = Student.objects.filter(student_class=student_class)
-
-    # Create a formset for Marks
-    MarkFormSet = modelformset_factory(Mark, form=MarkForm, extra=len(students))
-
-    if request.method == 'POST':
-        formset = MarkFormSet(request.POST)
-        if formset.is_valid():
-            formset.save()
-            return render(request, 'students/marks_success.html', {'student_class': student_class})
-    else:
-        initial_data = [{'student': student.id} for student in students]
-        formset = MarkFormSet(queryset=Mark.objects.none(), initial=initial_data)
-
-    return render(request, 'students/class_marks.html', {
-        'student_class': student_class,
-        'students': students,
-        'formset': formset,
-    })
-
-def submit_marks(request):
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        student_id = data['student_id']
-        subject = data['subject']
-        mark = data['mark']
-
-        # Get the student object
-        student = Student.objects.get(id=student_id)
-
-        # Create and save the mark object
-        Mark.objects.create(student=student, subject=subject, mark=mark)
-        
-        return JsonResponse({'success': True})
-    
-    return JsonResponse({'success': False}, status=400) '''
-
-
-## views.py
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-from django.contrib import messages
-from .models import Class, Student, Mark
-from .forms import MarkForm
-
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from django.urls import reverse
-from django.contrib import messages
-from .models import Class, Student, Mark
-from .forms import MarkForm
-
-def class_marks(request, class_id):
+''' def class_marks(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
     students = Student.objects.filter(student_class=student_class)
     
@@ -521,12 +317,7 @@ def class_marks(request, class_id):
     return render(request, 'students/class_marks.html', {
         'student_class': student_class,
         'students': forms
-    })
-
-
-
-from django.shortcuts import render, get_object_or_404
-from .models import Class, Student
+    }) '''
 
 def class_student_list(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
@@ -535,11 +326,7 @@ def class_student_list(request, class_id):
     return render(request, 'students/class_student_list.html', {
         'student_class': student_class,
         'students': students
-    })
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Class
+    }) 
 
 def confirm_delete_class(request, class_id):
     student_class = get_object_or_404(Class, id=class_id)
@@ -548,13 +335,6 @@ def confirm_delete_class(request, class_id):
         messages.success(request, 'Class deleted successfully.')
         return redirect('class_list')  # Replace 'class_list' with your actual class list view name
     return render(request, 'students/confirm_delete_class.html', {'student_class': student_class})
-
-
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Student, Attendance
-from .forms import AttendanceForm
-from datetime import datetime
 
 def edit_student_attendance(request, student_id, date):
     student = get_object_or_404(Student, id=student_id)
@@ -572,6 +352,18 @@ def edit_student_attendance(request, student_id, date):
 
     return render(request, 'students/edit_student_attendance.html', {'student': student, 'form': form, 'date': attendance_date})
 
+'''def class_marks_view(request, class_id):
+    student_class = get_object_or_404(Class, id=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    
+    # Fetch marks for all students in the class
+    marks = Mark.objects.filter(student__in=students)
+    
+    return render(request, 'students/class_marks_view.html', {
+        'student_class': student_class,
+        'students': students,
+        'marks': marks  # Pass marks to the template
+    })'''
 
 from django.shortcuts import render, get_object_or_404
 from .models import Class, Student, Mark
@@ -583,54 +375,21 @@ def class_marks_view(request, class_id):
     # Fetch marks for all students in the class
     marks = Mark.objects.filter(student__in=students)
     
+    # Organize marks by test names
+    marks_by_test = {}
+    for mark in marks:
+        test_name = mark.test
+        if test_name not in marks_by_test:
+            marks_by_test[test_name] = []
+        marks_by_test[test_name].append(mark)
+    
     return render(request, 'students/class_marks_view.html', {
         'student_class': student_class,
         'students': students,
-        'marks': marks  # Pass marks to the template
+        'marks_by_test': marks_by_test,
+        'marks':mark  # Pass marks organized by test to the template
     })
-# from django.shortcuts import render, get_object_or_404, redirect
-# from django.contrib import messages
-# from .models import Student, Attendance
-# from .forms import AttendanceForm
-# from datetime import date
 
-# def attendance_update(request, student_id):
-#     student = get_object_or_404(Student, id=student_id)
-#     if request.method == 'POST':
-#         form = UpdateAttendanceForm(request.POST)
-#         if form.is_valid():
-#             status = form.cleaned_data['status']
-#             date = form.cleaned_data['date']
-            
-#             # Check if attendance for this student on this date already exists
-#             try:
-#                 attendance = Attendance.objects.get(student=student, date=date)
-                
-#                 # Update existing attendance record
-#                 attendance.status = status
-#                 attendance.save()
-                
-#                 messages.success(request, 'Attendance updated successfully.')
-#             except Attendance.DoesNotExist:
-#                 # Create new attendance record if none exists for this date
-#                 attendance = Attendance(student=student, date=date, status=status)
-#                 attendance.save()
-                
-#                 messages.success(request, 'Attendance recorded successfully.')
-            
-#             return redirect('class_student_list', class_id=student.student_class.id)
-#     else:
-#         # Handle GET request or form initialization
-#         form = UpdateAttendanceForm()
-    
-#     # Render the template with the form
-#     return render(request, 'students/attendance_update.html', {'form': form, 'student': student})
-
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import Student, Attendance, Period
-from .forms import UpdateAttendanceForm
 
 def attendance_update(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -640,36 +399,20 @@ def attendance_update(request, student_id):
             status = form.cleaned_data['status']
             date = form.cleaned_data['date']
             period = form.cleaned_data['period']
-            
-            # Check if attendance for this student on this date and period already exists
             try:
                 attendance = Attendance.objects.get(student=student, date=date, period=period)
-                
-                # Update existing attendance record
                 attendance.status = status
                 attendance.save()
-                
                 messages.success(request, 'Attendance updated successfully.')
             except Attendance.DoesNotExist:
-                # Create new attendance record if none exists for this date and period
                 attendance = Attendance(student=student, date=date, period=period, status=status)
                 attendance.save()
-                
                 messages.success(request, 'Attendance recorded successfully.')
             
             return redirect('class_student_list', class_id=student.student_class.id)
     else:
-        # Handle GET request or form initialization
         form = UpdateAttendanceForm()
-    
-    # Render the template with the form
     return render(request, 'students/attendance_update.html', {'form': form, 'student': student})
-
-
-# views.py
-
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Student, Mark
 
 def marks_update(request, student_id):
     student = get_object_or_404(Student, id=student_id)
@@ -687,16 +430,6 @@ def marks_update(request, student_id):
         return redirect('marks_update', student_id=student.id)
     
     return render(request, 'students/marks_update.html', {'student': student, 'marks': marks})
-
-
-# views.py
-# views.py
-# views.py
-from django.shortcuts import render, get_object_or_404, redirect
-from .models import Mark
-from django.http import HttpResponseBadRequest
-from django.core.exceptions import MultipleObjectsReturned
-from django.contrib import messages  # Import messages module
 
 def delete_mark_by_name(request):
     if request.method == 'POST':
@@ -725,3 +458,112 @@ def delete_mark_by_name(request):
 
 
 
+# from django.shortcuts import render, get_object_or_404, redirect
+# from django.http import HttpResponseRedirect
+# from django.urls import reverse
+# from django.contrib import messages
+# from .models import Class, Student, Mark
+# from .forms import MarkForm
+
+# def class_marks(request, class_id):
+#     student_class = get_object_or_404(Class, id=class_id)
+#     students = Student.objects.filter(student_class=student_class)
+    
+#     if request.method == 'POST':
+#         forms = [
+#             (student, MarkForm(request.POST, prefix=str(student.id), instance=Mark(student=student)))
+#             for student in students
+#         ]
+        
+#         all_valid = True
+#         for student, form in forms:
+#             if form.is_valid():
+#                 form.save()
+#             else:
+#                 all_valid = False
+#                 print(form.errors)
+        
+#         if all_valid:
+#             messages.success(request, "Marks submitted successfully!")
+#             return HttpResponseRedirect(reverse('class_marks', args=[class_id]))
+    
+#     else:
+#         forms = [
+#             (student, MarkForm(prefix=str(student.id), instance=Mark(student=student)))
+#             for student in students
+#         ]
+    
+#     return render(request, 'students/class_marks.html', {
+#         'student_class': student_class,
+#         'students': forms
+#     })
+
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.contrib import messages
+from .models import Class, Student, Mark
+from .forms import MarkForm
+
+def class_marks(request, class_id):
+    student_class = get_object_or_404(Class, id=class_id)
+    students = Student.objects.filter(student_class=student_class)
+    
+    if request.method == 'POST':
+        test_name = request.POST.get('test_name')
+        all_valid = True
+
+        forms = []  # Initialize the forms list
+
+        for student in students:
+            form_data = request.POST.copy()
+            form_data[f'{student.id}-test'] = test_name  # Ensure the test name is set in the form data with prefix
+            form = MarkForm(form_data, prefix=str(student.id), instance=Mark(student=student))
+            forms.append((student, form))  # Append the form to the forms list
+            if form.is_valid():
+                form.save()
+            else:
+                all_valid = False
+                print(form.errors)
+        
+        if all_valid:
+            messages.success(request, "Marks submitted successfully!")
+            return HttpResponseRedirect(reverse('class_marks', args=[class_id]))
+    
+    else:
+        forms = [
+            (student, MarkForm(prefix=str(student.id), instance=Mark(student=student)))
+            for student in students
+        ]
+    
+    return render(request, 'students/class_marks.html', {
+        'student_class': student_class,
+        'students': forms
+    })
+
+def add_period(request):
+    if request.method == 'POST':
+        form=PeriodForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('class_list'))    
+    else:
+        form=PeriodForm()
+    return render(request,'students/add_period.html',{'form':form})
+
+
+
+def add_timetable(request):
+    if request.method == 'POST':
+        form = TimetableForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('class_list'))  
+    else:
+        form = TimetableForm()
+    return render(request, 'students/add_timetable.html', {'form': form})
+
+def view_timetable(request, class_id):
+    student_class = Class.objects.get(id=class_id)
+    timetables = student_class.timetables.all()
+    return render(request, 'students/view_timetable.html', {'student_class': student_class, 'timetables': timetables})

@@ -106,6 +106,9 @@
         [for="class_id"]{
             margin-left:15%;
         }
+        #btn1{
+            float: right;
+        }
     </style>
 </head>
 <body>
@@ -124,28 +127,30 @@
                 </select>
                 <button type="submit" class="btn btn-primary">Search</button>
         </form>
-
+       
         {% if students %}
             <div class="table-responsive">
+                <a class="btn btn-primary btn-sm  mb-3 " id="btn1" href="{% url 'add_student' %}">Add Student</a>
                 <table class="table table-striped">
+                    
                     <thead>
                         <tr>
+                            
                             <th>Roll Number</th>
                             <th>Name</th>
-                           
                             <th>Class</th>
                             <th>Update</th>
                             <th>Delete</th>
                             <th>View Attendance</th>
                             <th>View Marks</th>
                         </tr>
+                        
                     </thead>
                     <tbody>
                         {% for student in students %}
                         <tr>
                             <td>{{ student.roll_number }}</td>
                             <td>{{ student.name }}</td>
-                            
                             <td>{{ student.student_class }}</td>
                             <td><a class="btn btn-sm btn-info" href="{% url 'edit_student' student.pk %}">Update</a></td>
                             <td><a class="btn btn-sm btn-danger" href="{% url 'confirm_delete' student.pk %}">Delete</a></td>
